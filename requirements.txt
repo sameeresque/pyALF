@@ -1,0 +1,10 @@
+scipy
+pandas
+scikit-learn
+asdf
+spectres
+Pickle5
+astropy
+matplotlib
+cython
+pytest
