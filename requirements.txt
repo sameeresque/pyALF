@@ -8,3 +8,5 @@ astropy
 matplotlib
 cython
 pytest
+ipykernel
+astroquery
