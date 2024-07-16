@@ -8,8 +8,6 @@ import re
 import shutil
 import string
 from scipy.signal import savgol_filter
-from astropy.coordinates import SkyCoord
-from astroquery.ned import Ned
 from scipy.signal import argrelextrema
 from numpy import median
 import astropy.constants as c

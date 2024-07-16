@@ -10,6 +10,7 @@ pip install -r requirements.txt
 ```
 pip install git+https://github.com/jchowk/pyNorm.git
 export PYTHONPATH="$PYTHONPATH:/path/to/pyNorm/"
+For convenience put the above line with the correct path in your .bash_profile file
 Rename the "io" folder to "ios" to avoid a conflict with some system files
 ```
 
