@@ -24,9 +24,9 @@ pip show pyNorm
 git clone https://github.com/sameeresque/pyALF/
 cd pyALF
 pip install .
-
-(Note: pip will use setup.py to install your module. Avoid calling setup.py directly.)
 ```
+
+Note: pip will use setup.py to install your module. Avoid calling setup.py directly.
 
 ## **Include `pyALF` in your `$PYTHONPATH`:**
 
