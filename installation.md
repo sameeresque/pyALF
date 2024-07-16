@@ -1,8 +1,10 @@
 # pyALF: Installing `pyALF`
 
 ## Before installing pyALF, it is suggested to create a conda environment for pyALF
+```
 conda create -n pyALF python=3.10
 pip install -r requirements.txt
+```
 
 ## In addition to installing the packages in requirements.txt, it is recommended to install pyNorm which provides some useful functions for the measurement of absorption line properties 
 ```
