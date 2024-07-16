@@ -8,6 +8,7 @@ pip install -r requirements.txt
 ```
 pip install git+https://github.com/jchowk/pyNorm.git
 export PYTHONPATH="$PYTHONPATH:/path/to/pyNorm/"
+Rename the "io" folder to "ios" to avoid a conflict with some system files
 ```
 
 ## **Download from GitHub and install via `pip`:**
