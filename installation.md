@@ -15,7 +15,7 @@ For convenience put the above line with the correct path in your .bash_profile f
 ## To look up the location of pynorm:
 
 ```
-git show pyNorm
+pip show pyNorm
 ```
 
 ## **Download from GitHub and install via `pip`:**
