@@ -17,6 +17,13 @@ from astropy import constants as const
 c_light=299792.458
 LYA = 1215.6 # angstrom
 
+def clean_spectra(wave,flux,err):
+    wave_c = wave[(err<0.05)&(flux>0)]
+    flux_c = flux[(err<0.05)&(flux>0)]
+    err_c = err[(err<0.05)&(flux>0)]
+
+    return wave_c,flux_c,err_c
+    
 ############## Functions from myfuncpyNorm ###############
 
 def fix_unwriteable_spec(spec):
