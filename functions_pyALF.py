@@ -820,61 +820,395 @@ def widths(i,j,ion,transition,spec):
 vwidths=np.vectorize(widths)   
 
 
+def filter_and_transform_dictionary(dictionary, threshold):
+    """
+    This function is used to remove any absorption systems that are beyond the emission redshift of the quasar.
+    """
+    filtered_dict = {key: [min(values), max(values)] for key, values in dictionary.items() if any(val <= threshold for val in values)}
+    return filtered_dict
 
-def getINFO(number,ion,transition,spec,species,zem,pr):
+
+def remove_empty_filter_dictionary(my_dict):
+    """
+    This function removes keys with empty values
+    """
+    filtered_dict = {k: v for k, v in my_dict.items() if v}
+    return filtered_dict
+
+def getdictsep(wave,flux,error,species,z):
+    """
     
-    d=spec[(spec['Rest-Wavelength']>=spec['Rest-Wavelength'][np.array(pr)[number][0]]) &
-       (spec['Rest-Wavelength']<=spec['Rest-Wavelength'][np.array(pr)[number][1]])]
+    This function is meant to create a dictionary consisting of keys that can be ingested by PyNorm. 
+    Args:
+        wave (array of floats): The observed wavelength array
+        flux (array of floats): The normalized flux array
+        error (array of floats): The array of errors associated with the normalized flux
+        species (dict) : The dictionary comprising of information on atomic line data
+        z (float): The redshift of the absorption system whose measurements are of interest.
+    Returns:
+        dict: A dictionary that can be ingested by PyNorm for performing line measurements.
     
-    #identify absorption lines within this region by determining the minima
-    if len(d['FLUX'])>=5:
-        x=savgol_filter(d['FLUX'],5,1) #smoothing the array
+    """
+    
+    dictionary = {}
+    obs_wave = wave
+    flux = flux
+    error = error
+    
+    for specie in species:
+        for transition in species[specie]:
+
+            vel = getVel(obs_wave,species[specie][transition][0],z)
+            #print (vel)
+            
+            vel_sel = np.where((vel<=4000) & (vel>=-4000))
+
+            dictionary['{}_{}'.format(specie,transition)] = {'z':z,'vel':vel[vel_sel],'flux':flux[vel_sel],'eflux':error[vel_sel],
+            'wavc':species[specie][transition][0],
+            'fval':species[specie][transition][1],
+            'contin':np.ones(len(vel[vel_sel])),
+            'contin_err':np.zeros(len(vel[vel_sel]))}
+            
+    return dictionary
+
+
+def rebin_spectra(vel1, flux1, vel2, flux2, new_vel):
+    """
+    This function is meant to rebin a spectrum onto a common velocity axis.
+
+    Args:
+        vel1: velocity array of the first spectrum
+        flux1: flux array of the first spectrum
+        vel2: velocity array of the second spectrum
+        flux2: flux array of the second spectrum        
+
+    Returns:
+        arrays: flux arrays of the first and second spectra.
+    """
+    
+    interp_flux1 = interp1d(vel1, flux1, kind='linear', bounds_error=False, fill_value=np.nan)
+    interp_flux2 = interp1d(vel2, flux2, kind='linear', bounds_error=False, fill_value=np.nan)
+
+    new_flux1 = interp_flux1(new_vel)
+    new_flux2 = interp_flux2(new_vel)
+
+    return new_flux1, new_flux2
+
+
+def find_overlapping_bounds(outer_dict):
+    """
+    This function finds absorption components that overlap in redshift. 
+    These overlapping components could be absorption arising from different HI transitions of the same absorption system.
+    However, these components are vetted further below to remove false positives.
+    """
+    
+    overlapping_outer_inner_keys = []
+
+    outer_keys = list(outer_dict.keys())
+
+    for i in range(len(outer_keys)):
+        for j in range(i + 1, len(outer_keys)):
+            outer_key1, outer_key2 = outer_keys[i], outer_keys[j]
+            inner_dict1, inner_dict2 = outer_dict[outer_key1], outer_dict[outer_key2]
+
+            for key1, bounds1 in inner_dict1.items():
+                for key2, bounds2 in inner_dict2.items():
+                    if (bounds1[0] <= bounds2[1] and bounds1[1] >= bounds2[0]) or \
+                       (bounds2[0] <= bounds1[1] and bounds2[1] >= bounds1[0]):
+                        overlapping_outer_inner_keys.append(((outer_key1, key1), (outer_key2, key2)))
+
+    combined_tuples = []
+    for i, tuple1 in enumerate(overlapping_outer_inner_keys):
+        combined_tuple = list(tuple1)
+        for j, tuple2 in enumerate(overlapping_outer_inner_keys[i + 1:]):
+            if set(tuple1).intersection(set(tuple2)):
+                combined_tuple.extend(x for x in tuple2 if x not in tuple1)
+        combined_tuples.append(tuple(combined_tuple))
+
+    return combined_tuples
+
+
+def split_tuples(tuple_list):
+    """
+    Split a list of tuples into groups based on increasing first elements.
+
+    This function takes a list of tuples and splits it into groups where the first
+    element of each tuple is in ascending order within each group. A new group is
+    started whenever the first element of a tuple is less than or equal to the
+    first element of the previous tuple.
+
+    Parameters:
+    tuple_list (list): A list of tuples, where each tuple has at least one element.
+
+    Returns:
+    list: A list of tuples, where each tuple contains a group of original tuples
+          with increasing first elements.
+    
+    """
+
+    
+    result = []
+    current_group = []
+
+    for tpl in tuple_list:
+        if not current_group or tpl[0] > current_group[-1][0]:
+            current_group.append(tpl)
+        else:
+            result.append(tuple(current_group))
+            current_group = [tpl]
+
+    if current_group:
+        result.append(tuple(current_group))
+
+    return result
+
+
+
+def getinfozblock(wave,flux,err,block):
+    """
+    Analyze spectral data for a given block of transitions.
+
+    This function processes spectral data for a set of transitions, calculates
+    redshift ranges, and extracts properties for each transition.
+
+    Parameters:
+    wave (array-like): Wavelength data of the spectrum.
+    flux (array-like): Flux data of the spectrum.
+    err (array-like): Error data of the spectrum.
+    block (list): A list of tuples, each containing element and transition information.
+
+    Returns:
+    dict: A dictionary containing properties for each unique transition in the block.
+          Each key is a transition identifier, and the value is a dictionary of
+          spectral properties for that transition.
+
+    Notes:
+    - The function uses several external dictionaries and functions (pr_dict_n,
+      transition_library, myfuncpyNorm, etc.) which should be defined elsewhere
+      in the code.
+    - It calculates a common center of redshifts for the given transitions.
+    - The function focuses on Hydrogen I (HI) transitions.
+    - Properties are calculated within velocity ranges determined by the redshift
+      limits of each transition.
+    """
+    
+    z_element = []
+    choose_transitions = []
+    for element in block:
+        z_element.append(pr_dict_n[element[0]][element[1]])
+        choose_transitions.append(element[1])
+
+    
+    min_first = min(z_element, key=lambda x: x[0])[0]
+    max_second = max(z_element, key=lambda x: x[1])[1]
+    center = 0.5*(min_first+max_second)
+
+
+    use_species = speciesinterest(['HI'],transition_library,choose={'HI':list(set(choose_transitions))})
+    makeinpdict = getdictsep(wave,flux,err,use_species,center)
+
+
+    z_l,z_h = [],[]
+    for num, element in enumerate(block):    
+        z_l.append((element[1],pr_dict_n[element[0]][element[1]][0])) 
+        z_h.append((element[1],pr_dict_n[element[0]][element[1]][1]))
+        
+
+    unique_values_min = {}
+
+    #print (z_l)
+    for key, value in z_l:
+        if key not in unique_values_min:
+            unique_values_min[key] = value
+        else:
+            unique_values_min[key] = min(unique_values_min[key], value)
+    
+    # Creating a list of unique tuples
+    unique_tuples_min = [(key, value) for key, value in unique_values_min.items()]
+    #print (unique_tuples_min)
+
+    unique_values_max = {}
+    
+    for key, value in z_h:
+        if key not in unique_values_max:
+            unique_values_max[key] = value
+        else:
+            unique_values_max[key] = max(unique_values_max[key], value)
+    
+    # Creating a list of unique tuples
+    unique_tuples_max = [(key, value) for key, value in unique_values_max.items()]
+
+
+    properties = {}
+
+    for num,transition in enumerate(unique_tuples_min):
+        v1,v2 = -findV(unique_tuples_min[num][1],center), findV(center,unique_tuples_max[num][1])
+
+        vmin,vmax = min(makeinpdict['HI_{}'.format(transition[0])]['vel']),max(makeinpdict['HI_{}'.format(transition[0])]['vel'])
+
+        
+        v1 = v1 if vmin<v1 else vmin
+        v2 = v2 if vmax>v2 else vmax
+
+        
+        
+        
+        properties[transition[0]] = getproperty(makeinpdict['HI_{}'.format(transition[0])],[v1,v2])
+    
+    return properties
+
+def get_merged_transitions_tuples(inp):
+    """
+    Merge and group spectral transitions based on velocity proximity.
+
+    This function analyzes multiple spectral transitions, identifies peaks,
+    and groups transitions that have matching peaks within a 10 km/s velocity range.
+
+    Parameters:
+    inp (dict): A dictionary where keys are transition identifiers and values are
+                dictionaries containing 'vel' (velocity), 'Nav' (flux), and 'z' (redshift) data.
+
+    Returns:
+    list of tuples: Each tuple contains:
+                    - A velocity key (float, rounded to 2 decimal places)
+                    - A tuple of transition information, where each item is a tuple of:
+                      (velocity, transition identifier, calculated absorption redshift)
+
+    Notes:
+    - The function uses numpy for quantile calculations and scipy's find_peaks for peak detection.
+    - Peaks are identified using a width of 5, and a height/prominence threshold of the 25th percentile
+      of positive flux values.
+    - Transitions are considered matching if their peak velocities are within 10 km/s of each other.
+    - The returned list is sorted by the velocity key.
+    - The function assumes the existence of a 'findZAbs' function to calculate absorption redshift.
+    """
+    
+    merged_transitions = {}
+
+    transitions_dict = inp
+    for idx, (transition1, transition2) in enumerate(combinations(transitions_dict.keys(), 2)):
+        velocity1 = transitions_dict[transition1]['vel']
+        flux1 = transitions_dict[transition1]['Nav']
+        velocity2 = transitions_dict[transition2]['vel']
+        flux2 = transitions_dict[transition2]['Nav']
+    
+        z1 = transitions_dict[transition1]['z']
+        z2 = transitions_dict[transition2]['z']
+        
+        use_height_1 = np.quantile(flux1[flux1>0],0.25)
+        use_height_2 = np.quantile(flux2[flux2>0],0.25)
+    
+        flux1_ = flux1[flux1>use_height_1]
+        flux2_ = flux2[flux2>use_height_2]
+        
+        
+        # Find peaks in flux arrays
+        peaks1, _ = find_peaks(flux1, width = 5, height = use_height_1,prominence = use_height_1)
+        peaks2, _ = find_peaks(flux2, width = 5, height = use_height_2,prominence = use_height_2)
+        
+
+        
+        # Check for matching peaks within 10 km/s
+        for peak1 in peaks1:
+            for peak2 in peaks2:
+                if abs(velocity1[peak1] - velocity2[peak2]) <= 10:
+                    # Group matching transitions based on velocity proximity
+                    key = round(velocity1[peak1], 2)  # Using velocity as key (rounded to two decimal places)
+                    if key not in merged_transitions:
+                        merged_transitions[key] = set()  # Initialize set if key not present
+                    merged_transitions[key].add((velocity1[peak1], transition1, findZAbs(-velocity1[peak1],z1)))
+                    merged_transitions[key].add((velocity2[peak2], transition2, findZAbs(-velocity2[peak2],z2)))
+    
+    # Convert sets to tuples
+    merged_transitions_tuples = [(key, tuple(value)) for key, value in merged_transitions.items()]
+    merged_transitions_tuples.sort(key = lambda x: x[0])
+    return merged_transitions_tuples
+
+
+
+def cossim(t1,t2,makeinpdict):
+    """
+    Calculate the cosine similarity between two spectra.
+
+    This function processes two spectra, normalizes them, and calculates their cosine similarity.
+    It handles rebinning of spectra to ensure they are on the same velocity grid before comparison.
+
+    Parameters:
+    t1 (str or int): Identifier for the first spectrum in makeinpdict.
+    t2 (str or int): Identifier for the second spectrum in makeinpdict.
+    makeinpdict (dict): A dictionary containing spectral data for different identifiers.
+
+    Returns:
+    float: The cosine similarity between the two spectra, ranging from -1 to 1.
+           1 indicates perfect similarity, 0 indicates no similarity, and -1 indicates perfect dissimilarity.
+
+    Notes:
+    - The function uses a velocity range of -100 to 100 km/s for the comparison.
+    - Spectra are rebinned to a common velocity grid if necessary.
+    - The spectra are normalized before calculating cosine similarity.
+    - Uses external functions: myfuncpyNorm.getproperty, rebin_spectra, and cosine_similarity.
+    """
+    
+    properties1 = getproperty(makeinpdict[t1],[-100,100])
+    properties2 = getproperty(makeinpdict[t2],[-100,100])
+
+    vel1 = properties1['vel']
+    vel_sel1 = np.where((vel1<=100) & (vel1>=-100))
+    vel1_use = vel1[vel_sel1]
+    spectrum1 = properties1['Nav'][vel_sel1]
+    
+    vel2 = properties2['vel']
+    vel_sel2 = np.where((vel2<=100) & (vel2>=-100))
+    vel2_use = vel2[vel_sel2]
+    spectrum2 = properties2['Nav'][vel_sel2]
+    
+    
+    spectrum1,spectrum2 = rebin_spectra(vel1_use, spectrum1, vel2_use, spectrum2, np.arange(min(vel1_use[0],vel2_use[0]),max(vel1_use[-1],vel2_use[-1])+vel1[1]-vel1[0],vel1[1]-vel1[0]))
+    
+    spectrum1_norm = spectrum1 / np.linalg.norm(spectrum1)
+    spectrum2_norm = spectrum2 / np.linalg.norm(spectrum2)
+    
+    # Reshape spectra into column vectors (required for cosine similarity calculation)
+    spectrum1_norm = spectrum1_norm.reshape(-1, 1)
+    spectrum2_norm = spectrum2_norm.reshape(-1, 1)
+    
+    # Calculate cosine similarity
+    similarity = cosine_similarity(spectrum1_norm.T, spectrum2_norm.T)[0, 0]   
+
+    return similarity
+
+
+
+def unique_pairs(items):
+    return list(combinations(items, 2))
+def at_least_three_above_threshold(numbers, threshold=0.6):
+    return sum(1 for num in numbers if num > threshold) >= 3
+
+def redshiftgood(redshift):
+    import warnings
+    warnings.filterwarnings("ignore")
+    cov_transitions=[]
+    for transition_check in species['HI']:
+        if  wave[0] <= species['HI'][transition_check][0]*(1.0+redshift) <= wave[-1]:
+            cov_transitions.append(transition_check)
+    use_species = speciesinterest(['HI'],transition_library,choose={'HI':cov_transitions})
+    
+    makeinpdict = getdictsep(wave,flux,err,use_species,redshift)
+
+    ups = unique_pairs(cov_transitions)
+    
+    cossim_values = OrderedDict()
+    for up in ups:
+        cossim_values[up] = cossim('HI_{}'.format(up[0]),'HI_{}'.format(up[1]),makeinpdict) 
+    
+    firstquant, median, thirdquant = np.quantile(list(cossim_values.values()),[0.25,0.5,0.75])
+    minval, maxval = np.min(list(cossim_values.values())),np.max(list(cossim_values.values()))
+
+
+    if (maxval >= 0.8) and (at_least_three_above_threshold(list(cossim_values.values()))):
+        return 1
     else:
-        x=savgol_filter(d['FLUX'],3,1) #smoothing the array
+        return 0
     
-    yvals=x[argrelextrema(x, np.less)[0]]
-    xvals=np.asarray(d[ion+min(list(species[ion].keys()))+'_Vel'])[argrelextrema(x, np.less)[0]]
-    
-    k=list(range(0,40,1))    
-    zlocs=[]
-    
-    list_species=list(species[ion].keys())
-    list_species.remove(min(list(species[ion].keys())))
-    
-    for j in xvals:
-        for i in k:
-            try:
-                for listspec in list_species:
-                    if spec[ion+listspec+'_Vel'][np.array(pr)[number+i][0]] <= j <= spec[ion+listspec+'_Vel'][np.array(pr)[number+i][1]]:
-                        zlocs.append(findZAbs(-j, zem))
-            except IndexError:
-                break
 
-    d = d.reset_index(drop=True)
-    try:
-        if transition==min(species[ion]):
-            return (min(d[ion+transition+'_Vel']),max(d[ion+transition+'_Vel']),median(d['WAVELENGTH'])/species[ion][transition][0]-1,
-                    zlocs)
-        else:
-            return (min(d[ion+transition+'_Vel']),max(d[ion+transition+'_Vel']),median(d['WAVELENGTH'])/species[ion][transition][0]-1,
-                    None)
-    except:
-        if transition==min(species[ion]):
-            return (min(d[ion+transition+'_Vel']),max(d[ion+transition+'_Vel']),median(d['WAVELENGTH'])/species[ion][transition][0]-1,
-                    None)
-        else:
-            return (min(d[ion+transition+'_Vel']),max(d[ion+transition+'_Vel']),median(d['WAVELENGTH'])/species[ion][transition][0]-1,
-                    None)
-#vgetINFO=np.vectorize(getINFO)
-
-def getdf(spec,species,zem,pr,search_ions):
-    df = pd.DataFrame([])
-    for specie,transitions in species.items():
-        if specie in search_ions:
-            for transition in transitions:
-                for i in range(len(pr)):
-                    x=getINFO(i,specie,transition,spec,species,zem,pr)
-                    if (x[3]!=[]) and (x[3]!=None) and (x[0]>=search_ions[specie][0]) and (x[1]<=search_ions[specie][1]):
-                        d = {'SPECIES': specie,'TRANSITION':transition,'NUMBER':i,'VEL_MIN':x[0],'VEL_MAX':x[1],'MEDIAN-REDSHIFT':x[2],'REDSHIFT':[x[3]]}
-                        df=df.append(pd.DataFrame(data=d),ignore_index=True)
-    return df
+    
