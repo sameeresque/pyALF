@@ -28,7 +28,7 @@ def clean_spectra(wave,flux,err):
         err (array): numpy vector. Error array.
 
     Returns:
-        arrays : clean wavelength, flux and error arrays.
+        wave, flux, error (array) : clean wavelength, flux and error arrays.
     """
     wave_c = wave[(err<0.05)&(flux>0)]
     flux_c = flux[(err<0.05)&(flux>0)]
