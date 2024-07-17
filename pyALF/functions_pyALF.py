@@ -18,6 +18,18 @@ c_light=299792.458
 LYA = 1215.6 # angstrom
 
 def clean_spectra(wave,flux,err):
+    """Clean input spectrum
+
+    Removes problematic or unphysical pixels.
+
+    Args:
+        wave (array): numpy vector. Wavelength array.
+        flux (array): numpy vector. Flux array.
+        err (array): numpy vector. Error array.
+
+    Returns:
+        wave, flux, error (array) : clean wavelength, flux and error arrays.
+    """
     wave_c = wave[(err<0.05)&(flux>0)]
     flux_c = flux[(err<0.05)&(flux>0)]
     err_c = err[(err<0.05)&(flux>0)]
