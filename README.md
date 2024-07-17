@@ -9,7 +9,6 @@ A python Absorption Line Finding Tool. pyALF looks for weak HI absorption lines 
 Before installing pyALF, it is suggested to create a conda environment for pyALF
 ```
 conda create -n pyALF python=3.10
-pip install -r requirements.txt
 ```
 
 In addition to installing the packages in requirements.txt, you will need to install pyNorm which provides some useful functions for the measurement of absorption line properties 
@@ -32,6 +31,12 @@ cd pyALF
 pip install .
 ```
 
+## **Editable `pip` installation:**
+
+This installation approach allows edits to the code / `git pull` updates to be directly accessible. To enable this installation, invoke the following in the terminal from within the `pyALF` directory:
+```
+pip install -e .
+```
 Note: pip will use setup.py to install your module. Avoid calling setup.py directly.
 
 ## **Include `pyALF` in your `$PYTHONPATH`:**

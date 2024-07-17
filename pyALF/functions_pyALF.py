@@ -564,7 +564,7 @@ def pynn_eqwidth(spec_in,integration_limits = None,
         pass
 
     return spec
-
+'''
 def speciesinterest(plot_ions,transition_library,choose):
     """
     Return species of interest in plot_ions. Omit transitions not in choose for a corresponding ion.
@@ -616,9 +616,9 @@ def speciesinterest(plot_ions,transition_library,choose):
                     species[var].pop(transition)    
 
 
-    return species
+    return species'''
 
-
+'''
 def getVel(wave,l0,zabs):
     wave_center=l0*(zabs + 1.)
     vel=const.c.cgs.value*1e-5*(wave**2-wave_center**2)/(wave**2+wave_center**2) #in km/s
@@ -628,7 +628,7 @@ def findV(zAbs, zEm):
     c_light=299792.458
     v = ((((1.0+zEm)**2) - ((1.0+zAbs)**2))/(((1.0+zEm)**2) + ((1.0+zAbs)**2))) * c_light
     return v
-
+'''
 
 def getdict(spectrum,species,z):
     dictionary = {}
@@ -663,9 +663,10 @@ def getproperty(dictionary,integ):
     return dict(dict(s1,**s2),**s3)
 
 ############################
-def getVel2(wave,l0):
+'''def getVel2(wave,l0):
     vel=const.c.cgs.value*1e-5*(wave-l0)/(l0) #in km/s
     return vel
+'''
 #############################
 def getVel(wave,l0,zabs):
     wave_center=l0*(zabs + 1.)
@@ -688,16 +689,16 @@ def findZAbs(v, zEm):
 #########################################################################
 ###############################
 # velocity widths for a particular ion
-def widths(i,j,ion,transition):
+'''def widths(i,j,ion,transition):
     return abs(max(spec[i:j][ion+transition+'_Vel'])-min(spec[i:j][ion+transition+'_Vel']))
-vwidths=np.vectorize(widths)
+vwidths=np.vectorize(widths)'''
 ###############################
-def getEW(d,zabs):
+'''def getEW(d,zabs):
     d = d.reset_index(drop=True)
     ew=np.trapz(1-d['FLUX'],x=d['WAVELENGTH'])/(1+zabs)
     d['Del-W']=d[['WAVELENGTH']].shift(-1)-d[['WAVELENGTH']]
     err=(sum((d['ERROR']*d['Del-W'])**2))**0.5/(1+zabs)
-    return(ew,err)
+    return(ew,err)'''
 ##############################
 
 # function to translate the observed wavelength to rest wavelength
@@ -707,7 +708,7 @@ def restwavl(w,z):
 #############################
 
 #########################################################
-def fivesigmadet(x,y):
+'''def fivesigmadet(x,y):
     try:
         val=min(spec[x:y]['FLUX'][spec[x:y]['FLUX']>0])
         loc_min=np.where(spec['FLUX']==val)[0][0]
@@ -716,7 +717,7 @@ def fivesigmadet(x,y):
         else:
             return False
     except:
-        return False
+        return False'''
 #########################################################    
 
 
@@ -833,11 +834,11 @@ def addvel2spec(spec,species):
         for transition in transitions.items():
             spec[specie+transition[0]+'_Vel']=c_light*(spec['Rest-Wavelength']**2-transition[1][0]**2)/(spec['Rest-Wavelength']**2+transition[1][0]**2)
     return spec
-
+'''
 def widths(i,j,ion,transition,spec):
     return abs(max(spec[i:j][ion+transition+'_Vel'])-min(spec[i:j][ion+transition+'_Vel']))
 vwidths=np.vectorize(widths)   
-
+'''
 
 def filter_and_transform_dictionary(dictionary, threshold):
     """

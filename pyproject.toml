@@ -6,17 +6,5 @@ build-backend = "setuptools.build_meta"
 name = "pyALF"
 version = "0.1.0"
 
-dependencies = ["scipy",
-"pandas",
-"scikit-learn",
-"asdf",
-"spectres",
-"Pickle5",
-"astropy",
-"matplotlib",
-"cython",
-"pytest",
-"ipykernel",
-"astroquery",
- "numpy"
-]
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
