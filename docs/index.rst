@@ -10,6 +10,7 @@ Welcome to pyALF's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   pyALF.rst
    functions_pyALF.rst
 
 
