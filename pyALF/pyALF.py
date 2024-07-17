@@ -20,7 +20,7 @@ transition_library=pd.read_table('atomdata_updated_new.dat', sep='\s+',header=No
 transition_library=np.asarray(transition_library)
 
 qso = 'J121930+494052'
-filein = 'Example/{0}.asdf'.format(qso)
+filein = '../Example/{0}.asdf'.format(qso)
 plot_ions=['HI']
 af = asdf.open(filein)
 wave = np.asarray(af['wave'])
@@ -59,7 +59,7 @@ pr_dict_n = remove_empty_filter_dictionary(pr_dict)
 #pickle.dump(t1,open('overlappingbounds_J121930+494052.pkl','wb'),protocol=2)
 
 
-t1 = pd.read_pickle('Example/overlappingbounds_J121930+494052.pkl')
+t1 = pd.read_pickle('../Example/overlappingbounds_J121930+494052.pkl')
 
 
 
@@ -89,7 +89,7 @@ filtered_list = [tpl for tpl in merged if any(subtpl[1] == '1215' for subtpl in 
 
 result_list = sorted(number_counts.items(), key=lambda x: x[1], reverse=True)
 #pickle.dump(result_list,open('resultlist_J121930+494052.pkl','wb'),protocol=2)
-res_list = pd.read_pickle('Example/resultlist_J121930+494052.pkl')
+res_list = pd.read_pickle('../Example/resultlist_J121930+494052.pkl')
 
 sorted_res_list =sorted(res_list, key=lambda element: element[0])
 
@@ -100,4 +100,4 @@ sorted_res_list =sorted(res_list, key=lambda element: element[0])
 #selected_res = [res for res, good in zip(res_list, redshift_good) if good == 1]
 #pickle.dump(selected_res,open('selected_res_J121930+494052.pkl','wb'),protocol=2)
 
-selected_res = pd.read_pickle('Example/selected_res_J121930+494052.pkl')
+selected_res = pd.read_pickle('../Example/selected_res_J121930+494052.pkl')
