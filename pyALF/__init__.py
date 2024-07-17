@@ -1,7 +1,7 @@
 import os
 
 __version__ = "0.1.0"
-
+print('The current version of pyALF is: ', __version__)
 """
 # set Python env variable to keep track of example data dir
 pyALF_dir = os.path.dirname(__file__)
