@@ -10,12 +10,12 @@ pip install -r requirements.txt
 ```
 pip install git+https://github.com/jchowk/pyNorm.git
 export PYTHONPATH="$PYTHONPATH:/path/to/pyNorm/"
-For convenience put the above line with the correct path in your .bash_profile file
 ```
-## To look up the location of pynorm:
+
+## For convenience put the above line with the correct path in your .bash_profile or .zshrc (newer MacOS) file. To look up the location of pynorm:
 
 ```
-git show pyNorm
+pip show pyNorm
 ```
 
 ## **Download from GitHub and install via `pip`:**
@@ -24,9 +24,9 @@ git show pyNorm
 git clone https://github.com/sameeresque/pyALF/
 cd pyALF
 pip install .
-
-(Note: pip will use setup.py to install your module. Avoid calling setup.py directly.)
 ```
+
+Note: pip will use setup.py to install your module. Avoid calling setup.py directly.
 
 ## **Include `pyALF` in your `$PYTHONPATH`:**
 
