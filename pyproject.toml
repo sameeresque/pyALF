@@ -6,4 +6,5 @@ build-backend = "setuptools.build_meta"
 name = "pyALF"
 version = "0.1.0"
 
-dependencies = ["requirments.txt"]
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
