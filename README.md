@@ -19,10 +19,17 @@ conda activate pyALF
 In addition to installing the packages in requirements.txt, you will need to install pyNorm which provides some useful functions for the measurement of absorption line properties 
 ```
 pip install git+https://github.com/jchowk/pyNorm.git
-export PYTHONPATH="$PYTHONPATH:/path/to/pyNorm/"
+```
+## **Include `pyNorm` in your `$PYTHONPATH`:**
+
+Add the full path to the `pyNorm` code to your `$PYTHONPATH` variable in your .bash_profile or .zshrc (newer MacOS) file:
+
+```
+export PYTHONPATH="$PYTHONPATH:/path/to/pyNorm/pyNorm/"
 ```
 
-For convenience put the above line with the correct path in your .bash_profile or .zshrc (newer MacOS) file. To look up the location of pynorm:
+Note the path has to point to the subdirectory `pyNorm/pyNorm/`. 
+To look up the location of pynorm:
 
 ```
 pip show pyNorm
