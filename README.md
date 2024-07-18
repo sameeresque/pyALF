@@ -25,7 +25,7 @@ pip install git+https://github.com/jchowk/pyNorm.git
 Add the full path to the `pyNorm` code to your `$PYTHONPATH` variable in your .bash_profile or .zshrc (newer MacOS) file:
 
 ```
-export PYTHONPATH="$PYTHONPATH:/path/to/pyNorm/pyNorm/"
+export PYTHONPATH="$PYTHONPATH: /your/path/to/pyNorm/pyNorm/"
 ```
 
 Note the path has to point to the subdirectory `pyNorm/pyNorm/`. 
@@ -52,10 +52,10 @@ pip install -e .
 
 ## **Include `pyALF` in your `$PYTHONPATH`:**
 
-Add the full path to the `pyALF` code to your `$PYTHONPATH` variable by invoking, or better yet add the path to .bashrc and .profile files
+Add the full path to the `pyALF` code to your `$PYTHONPATH` variable by invoking, or better yet add the path to .bash_profile or .zshrc files
 
 ```
-export PYTHONPATH="$PYTHONPATH:/path/to/pyALF/"
+export PYTHONPATH="$PYTHONPATH:/your/path/to/pyALF/"
 ```
 
 # **To Uninstall pyALF**
