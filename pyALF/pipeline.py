@@ -149,6 +149,16 @@ class pyALF(object):
         '''The process to find possible HI absorbers based on available HI transitions from the overlapping bounds.
         and return the list of their redshifts with their counts and save it into the output directory.'''
         redshift_list = []
+
+        new_list = []
+        for num_t1,blk in enumerate(self.t1):
+            result_list = split_tuples(blk)
+            new_list.append(result_list)
+        import itertools
+        merged = list(itertools.chain(*new_list))
+
+        self.filtered_list = [tpl for tpl in merged if any(subtpl[1] == '1215' for subtpl in tpl)]
+
         for num,list_ in enumerate(self.filtered_list):
             inp = getinfozblock(self.wave,self.flux,self.err,list_)
             output_list = get_merged_transitions_tuples(inp)
@@ -194,15 +204,6 @@ class pyALF(object):
         Note: 
         This function won't return anything, it will save the plots in the folder named as '{qso}_images'.
         '''
-
-        new_list = []
-        for num_t1,blk in enumerate(self.t1):
-            result_list = split_tuples(blk)
-            new_list.append(result_list)
-        import itertools
-        merged = list(itertools.chain(*new_list))
-
-        filtered_list = [tpl for tpl in merged if any(subtpl[1] == '1215' for subtpl in tpl)]
 
         '''pool = Pool(4)
         pool.starmap(plot, zip(range(len(filtered_list[0:21])),filtered_list[0:21], repeat(self.wave),repeat(self.flux), repeat(self.err), repeat(self.species), repeat(self.output_folder), repeat(self.qso)))
