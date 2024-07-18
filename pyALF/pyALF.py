@@ -25,13 +25,14 @@ warnings.filterwarnings("ignore")
 transition_library=pd.read_table('atomdata_updated_new.dat', sep='\s+',header=None,comment = "#")
 transition_library=np.asarray(transition_library)
 
-# create folder for images
-if not os.path.exists('./test_images'):
-    os.makedirs('./test_images')
-
-
 #qso = 'J121930+494052'
-qso = sys.argv[1] 
+qso = sys.argv[1]
+# create folder for images
+if not os.path.exists('./{0}_images'.format(qso)):
+    os.makedirs('./{0}_images'.format(qso))
+
+
+ 
 filein = '../Example/{0}.asdf'.format(qso)
 plot_ions=['HI']
 af = asdf.open(filein)
