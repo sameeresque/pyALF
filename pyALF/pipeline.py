@@ -160,6 +160,7 @@ class pyALF(object):
         merged = list(itertools.chain(*new_list))
 
         self.filtered_list = [tpl for tpl in merged if any(subtpl[1] == '1215' for subtpl in tpl)]
+        pickle.dump(self.filtered_list,open('{0}/filtered_list_{1}.pkl'.format(self.output_folder,self.qso),'wb'),protocol=2)
 
         for num,list_ in enumerate(self.filtered_list):
             inp = getinfozblock(self.wave,self.flux,self.err,list_,self.pr_dict_n)
