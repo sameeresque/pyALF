@@ -10,3 +10,4 @@ cython
 pytest
 ipykernel
 astroquery
+pytz
