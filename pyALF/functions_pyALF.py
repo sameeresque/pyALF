@@ -926,16 +926,25 @@ def find_overlapping_bounds(outer_dict):
 
     outer_keys = list(outer_dict.keys())
 
-    for i in range(len(outer_keys)):
-        for j in range(i + 1, len(outer_keys)):
-            outer_key1, outer_key2 = outer_keys[i], outer_keys[j]
-            inner_dict1, inner_dict2 = outer_dict[outer_key1], outer_dict[outer_key2]
+    
+    key_pairs = [(outer_keys[i], outer_keys[j]) for i in range(len(outer_keys)) for j in range(i + 1, len(outer_keys))]
 
-            for key1, bounds1 in inner_dict1.items():
-                for key2, bounds2 in inner_dict2.items():
-                    if (bounds1[0] <= bounds2[1] and bounds1[1] >= bounds2[0]) or \
-                       (bounds2[0] <= bounds1[1] and bounds2[1] >= bounds1[0]):
-                        overlapping_outer_inner_keys.append(((outer_key1, key1), (outer_key2, key2)))
+    for outer_key1, outer_key2 in key_pairs:
+        inner_dict1, inner_dict2 = outer_dict[outer_key1], outer_dict[outer_key2]
+    
+        inner_keys1 = list(inner_dict1.keys())
+        inner_keys2 = list(inner_dict2.keys())
+    
+        for idx1, key1 in enumerate(inner_keys1):
+            bounds1 = inner_dict1[key1]
+            for idx2, key2 in enumerate(inner_keys2):
+                if idx1 < idx2:  
+                    continue
+                bounds2 = inner_dict2[key2]
+                if (bounds1[0] <= bounds2[1] and bounds1[1] >= bounds2[0]) or \
+                   (bounds2[0] <= bounds1[1] and bounds2[1] >= bounds1[0]):
+                    overlapping_outer_inner_keys.append(((outer_key1, key1), (outer_key2, key2)))
+
 
     combined_tuples = []
     for i, tuple1 in enumerate(overlapping_outer_inner_keys):
