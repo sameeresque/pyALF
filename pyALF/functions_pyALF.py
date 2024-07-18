@@ -1205,6 +1205,16 @@ def at_least_three_above_threshold(numbers, threshold=0.6):
     return sum(1 for num in numbers if num > threshold) >= 3
 
 def redshiftgood(redshift):
+    """Good redshift estimate
+
+    Checking if we have a good estimate of the Redshift.
+
+    Args:
+        redshift (float): float Redshift.
+
+    Returns:
+        1 or 0 (boolean) : Returns 1 if we have a redshift based on three lines and 0 otherwise.
+    """
     import warnings
     warnings.filterwarnings("ignore")
     cov_transitions=[]
