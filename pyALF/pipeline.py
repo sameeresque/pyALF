@@ -141,11 +141,18 @@ class pyALF(object):
         pickle.dump(self.t1,open('{0}/overlappingbounds_{1}.pkl'.format(self.output_folder,self.qso),'wb'),protocol=2)
         pickle.dump(self.pr_dict_n,open('{0}/pr_dict_n_{1}.pkl'.format(self.output_folder,self.qso),'wb'),protocol=2)
 
-    def read_overlappingbounds(self):
-        '''If the user already run the overlappingbounds() and has the pkl file in the output directory,
-        this function can be used to read the overlapping bounds instead of the running from the begginning.'''
-        self.t1 = pd.read_pickle('{0}/overlappingbounds_{1}.pkl'.format(self.output_folder,self.qso))
-        self.pr_dict_n = pd.read_pickle('{0}/pr_dict_n_{1}.pkl'.format(self.output_folder,self.qso))
+    def read_overlappingbounds(self,fname1,fname2):
+        '''If the user already run the overlappingbounds() and has two pkl files in the output directory,
+        this function can be used to read the overlapping bounds instead of the running from the begginning.
+        
+        Parameters:
+        fname1 (str): The path to the overlapping bounds pkl file.
+        fname2 (str): The path to the pr_dict_n pkl file.
+        
+        Note:
+        The fname1 and fname2 are the output files from the overlappingbounds() function.'''
+        self.t1 = pd.read_pickle(fname1)
+        self.pr_dict_n = pd.read_pickle(fname2)
 
     def find_absorbers(self):
         '''The process to find possible HI absorbers based on available HI transitions from the overlapping bounds.
@@ -173,11 +180,14 @@ class pyALF(object):
         self.res_list = sorted(number_counts.items(), key=lambda x: x[1], reverse=True)
         pickle.dump(self.res_list,open('{0}/resultlist_{1}.pkl'.format(self.output_folder,self.qso),'wb'),protocol=2)
 
-    def read_absorbers(self):
+    def read_absorbers(self,fname):
         '''If the user already run the find_absorbers() and has the pkl file in the output directory,
         this function can be used to read the result list of possible HI absorbers instead of the running 
-        from stratch.'''
-        self.res_list = pd.read_pickle('{0}/resultlist_{1}.pkl'.format(self.output_folder,self.qso))
+        from stratch.
+        
+        Parameters:
+        fname (str): The path to the result list pkl file.'''
+        self.res_list = pd.read_pickle(fname)
 
     def clean_list(self): 
         '''The process to remove the possible false positive and return the most possible 
@@ -188,10 +198,13 @@ class pyALF(object):
         self.selected_res = [res for res, good in zip(self.res_list, redshift_good) if good == 1]
         pickle.dump(self.selected_res,open('{0}/selected_res_{1}.pkl'.format(self.output_folder,self.qso),'wb'),protocol=2)
 
-    def read_clean_list(self):
+    def read_clean_list(self,fname):
         '''If the user already run the clean_list() and has the pkl file in the output directory,
-        this function can be used to read the the list.'''
-        self.selected_res = pd.read_pickle('{0}/selected_res_{1}.pkl'.format(self.output_folder,self.qso))
+        this function can be used to read the the list.
+        
+        Parameters:
+        fname (str): The path to the selected_res pkl file.'''
+        self.selected_res = pd.read_pickle(fname)
 
     def plot(self):
         '''
