@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Useful Functions for pyALF &mdash; pyALF v0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="pyALF" href="pyALF.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            pyALF
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="pyALF.html">pyALF</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Useful Functions for pyALF</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#functions_pyALF.clean_spectra"><code class="docutils literal notranslate"><span class="pre">clean_spectra()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#functions_pyALF.cossim"><code class="docutils literal notranslate"><span class="pre">cossim()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#functions_pyALF.filter_and_transform_dictionary"><code class="docutils literal notranslate"><span class="pre">filter_and_transform_dictionary()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#functions_pyALF.find_overlapping_bounds"><code class="docutils literal notranslate"><span class="pre">find_overlapping_bounds()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#functions_pyALF.get_merged_transitions_tuples"><code class="docutils literal notranslate"><span class="pre">get_merged_transitions_tuples()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#functions_pyALF.getdictsep"><code class="docutils literal notranslate"><span class="pre">getdictsep()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#functions_pyALF.getinfozblock"><code class="docutils literal notranslate"><span class="pre">getinfozblock()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#functions_pyALF.rebin_spectra"><code class="docutils literal notranslate"><span class="pre">rebin_spectra()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#functions_pyALF.remove_empty_filter_dictionary"><code class="docutils literal notranslate"><span class="pre">remove_empty_filter_dictionary()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#functions_pyALF.speciesinterest"><code class="docutils literal notranslate"><span class="pre">speciesinterest()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#functions_pyALF.split_tuples"><code class="docutils literal notranslate"><span class="pre">split_tuples()</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">pyALF</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Useful Functions for pyALF</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/functions_pyALF.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="useful-functions-for-pyalf">
+<span id="functions-pyalf"></span><h1>Useful Functions for pyALF<a class="headerlink" href="#useful-functions-for-pyalf" title="Permalink to this heading"></a></h1>
+<p>These are functions that pyALF uses to find the absorbtion lines.</p>
+<span class="target" id="module-functions_pyALF"></span><dl class="py function">
+<dt class="sig sig-object py" id="functions_pyALF.clean_spectra">
+<span class="sig-prename descclassname"><span class="pre">functions_pyALF.</span></span><span class="sig-name descname"><span class="pre">clean_spectra</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wave</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flux</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">err</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#functions_pyALF.clean_spectra" title="Permalink to this definition"></a></dt>
+<dd><p>Clean input spectrum</p>
+<p>Removes problematic or unphysical pixels.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>wave</strong> (<em>array</em>) – numpy vector. Wavelength array.</p></li>
+<li><p><strong>flux</strong> (<em>array</em>) – numpy vector. Flux array.</p></li>
+<li><p><strong>err</strong> (<em>array</em>) – numpy vector. Error array.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>clean wavelength, flux and error arrays.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>wave, flux, error (array)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="functions_pyALF.cossim">
+<span class="sig-prename descclassname"><span class="pre">functions_pyALF.</span></span><span class="sig-name descname"><span class="pre">cossim</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">makeinpdict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#functions_pyALF.cossim" title="Permalink to this definition"></a></dt>
+<dd><p>Calculate the cosine similarity between two spectra.</p>
+<p>This function processes two spectra, normalizes them, and calculates their cosine similarity.
+It handles rebinning of spectra to ensure they are on the same velocity grid before comparison.</p>
+<p>Parameters:
+t1 (str or int): Identifier for the first spectrum in makeinpdict.
+t2 (str or int): Identifier for the second spectrum in makeinpdict.
+makeinpdict (dict): A dictionary containing spectral data for different identifiers.</p>
+<p>Returns:
+float: The cosine similarity between the two spectra, ranging from -1 to 1.</p>
+<blockquote>
+<div><p>1 indicates perfect similarity, 0 indicates no similarity, and -1 indicates perfect dissimilarity.</p>
+</div></blockquote>
+<p>Notes:
+- The function uses a velocity range of -100 to 100 km/s for the comparison.
+- Spectra are rebinned to a common velocity grid if necessary.
+- The spectra are normalized before calculating cosine similarity.
+- Uses external functions: myfuncpyNorm.getproperty, rebin_spectra, and cosine_similarity.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="functions_pyALF.filter_and_transform_dictionary">
+<span class="sig-prename descclassname"><span class="pre">functions_pyALF.</span></span><span class="sig-name descname"><span class="pre">filter_and_transform_dictionary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dictionary</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#functions_pyALF.filter_and_transform_dictionary" title="Permalink to this definition"></a></dt>
+<dd><p>This function is used to remove any absorption systems that are beyond the emission redshift of the quasar.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="functions_pyALF.find_overlapping_bounds">
+<span class="sig-prename descclassname"><span class="pre">functions_pyALF.</span></span><span class="sig-name descname"><span class="pre">find_overlapping_bounds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">outer_dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#functions_pyALF.find_overlapping_bounds" title="Permalink to this definition"></a></dt>
+<dd><p>This function finds absorption components that overlap in redshift.
+These overlapping components could be absorption arising from different HI transitions of the same absorption system.
+However, these components are vetted further below to remove false positives.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="functions_pyALF.get_merged_transitions_tuples">
+<span class="sig-prename descclassname"><span class="pre">functions_pyALF.</span></span><span class="sig-name descname"><span class="pre">get_merged_transitions_tuples</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inp</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#functions_pyALF.get_merged_transitions_tuples" title="Permalink to this definition"></a></dt>
+<dd><p>Merge and group spectral transitions based on velocity proximity.</p>
+<p>This function analyzes multiple spectral transitions, identifies peaks,
+and groups transitions that have matching peaks within a 10 km/s velocity range.</p>
+<p>Parameters:
+inp (dict): A dictionary where keys are transition identifiers and values are</p>
+<blockquote>
+<div><p>dictionaries containing ‘vel’ (velocity), ‘Nav’ (flux), and ‘z’ (redshift) data.</p>
+</div></blockquote>
+<p>Returns:
+list of tuples: Each tuple contains:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>A velocity key (float, rounded to 2 decimal places)</p></li>
+<li><p>A tuple of transition information, where each item is a tuple of:
+(velocity, transition identifier, calculated absorption redshift)</p></li>
+</ul>
+</div></blockquote>
+<p>Notes:
+- The function uses numpy for quantile calculations and scipy’s find_peaks for peak detection.
+- Peaks are identified using a width of 5, and a height/prominence threshold of the 25th percentile</p>
+<blockquote>
+<div><p>of positive flux values.</p>
+</div></blockquote>
+<ul class="simple">
+<li><p>Transitions are considered matching if their peak velocities are within 10 km/s of each other.</p></li>
+<li><p>The returned list is sorted by the velocity key.</p></li>
+<li><p>The function assumes the existence of a ‘findZAbs’ function to calculate absorption redshift.</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="functions_pyALF.getdictsep">
+<span class="sig-prename descclassname"><span class="pre">functions_pyALF.</span></span><span class="sig-name descname"><span class="pre">getdictsep</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wave</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flux</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">species</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#functions_pyALF.getdictsep" title="Permalink to this definition"></a></dt>
+<dd><p>This function is meant to create a dictionary consisting of keys that can be ingested by PyNorm.
+:param wave: The observed wavelength array
+:type wave: array of floats
+:param flux: The normalized flux array
+:type flux: array of floats
+:param error: The array of errors associated with the normalized flux
+:type error: array of floats
+:param species: The dictionary comprising of information on atomic line data
+:type species: dict
+:param z: The redshift of the absorption system whose measurements are of interest.
+:type z: float</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>A dictionary that can be ingested by PyNorm for performing line measurements.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="functions_pyALF.getinfozblock">
+<span class="sig-prename descclassname"><span class="pre">functions_pyALF.</span></span><span class="sig-name descname"><span class="pre">getinfozblock</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wave</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flux</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">err</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">block</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#functions_pyALF.getinfozblock" title="Permalink to this definition"></a></dt>
+<dd><p>Analyze spectral data for a given block of transitions.</p>
+<p>This function processes spectral data for a set of transitions, calculates
+redshift ranges, and extracts properties for each transition.</p>
+<p>Parameters:
+wave (array-like): Wavelength data of the spectrum.
+flux (array-like): Flux data of the spectrum.
+err (array-like): Error data of the spectrum.
+block (list): A list of tuples, each containing element and transition information.</p>
+<p>Returns:
+dict: A dictionary containing properties for each unique transition in the block.</p>
+<blockquote>
+<div><p>Each key is a transition identifier, and the value is a dictionary of
+spectral properties for that transition.</p>
+</div></blockquote>
+<p>Notes:
+- The function uses several external dictionaries and functions (pr_dict_n,</p>
+<blockquote>
+<div><p>transition_library, myfuncpyNorm, etc.) which should be defined elsewhere
+in the code.</p>
+</div></blockquote>
+<ul class="simple">
+<li><p>It calculates a common center of redshifts for the given transitions.</p></li>
+<li><p>The function focuses on Hydrogen I (HI) transitions.</p></li>
+<li><p>Properties are calculated within velocity ranges determined by the redshift
+limits of each transition.</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="functions_pyALF.rebin_spectra">
+<span class="sig-prename descclassname"><span class="pre">functions_pyALF.</span></span><span class="sig-name descname"><span class="pre">rebin_spectra</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vel1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flux1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vel2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flux2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_vel</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#functions_pyALF.rebin_spectra" title="Permalink to this definition"></a></dt>
+<dd><p>This function is meant to rebin a spectrum onto a common velocity axis.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>vel1</strong> – velocity array of the first spectrum</p></li>
+<li><p><strong>flux1</strong> – flux array of the first spectrum</p></li>
+<li><p><strong>vel2</strong> – velocity array of the second spectrum</p></li>
+<li><p><strong>flux2</strong> – flux array of the second spectrum</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>flux arrays of the first and second spectra.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>arrays</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="functions_pyALF.remove_empty_filter_dictionary">
+<span class="sig-prename descclassname"><span class="pre">functions_pyALF.</span></span><span class="sig-name descname"><span class="pre">remove_empty_filter_dictionary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">my_dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#functions_pyALF.remove_empty_filter_dictionary" title="Permalink to this definition"></a></dt>
+<dd><p>This function removes keys with empty values</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="functions_pyALF.speciesinterest">
+<span class="sig-prename descclassname"><span class="pre">functions_pyALF.</span></span><span class="sig-name descname"><span class="pre">speciesinterest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plot_ions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transition_library</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">choose</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#functions_pyALF.speciesinterest" title="Permalink to this definition"></a></dt>
+<dd><p>Return species of interest in plot_ions. Omit transitions not in choose for a corresponding ion.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="functions_pyALF.split_tuples">
+<span class="sig-prename descclassname"><span class="pre">functions_pyALF.</span></span><span class="sig-name descname"><span class="pre">split_tuples</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tuple_list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#functions_pyALF.split_tuples" title="Permalink to this definition"></a></dt>
+<dd><p>Split a list of tuples into groups based on increasing first elements.</p>
+<p>This function takes a list of tuples and splits it into groups where the first
+element of each tuple is in ascending order within each group. A new group is
+started whenever the first element of a tuple is less than or equal to the
+first element of the previous tuple.</p>
+<p>Parameters:
+tuple_list (list): A list of tuples, where each tuple has at least one element.</p>
+<p>Returns:
+list: A list of tuples, where each tuple contains a group of original tuples</p>
+<blockquote>
+<div><p>with increasing first elements.</p>
+</div></blockquote>
+</dd></dl>
+
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="pyALF.html" class="btn btn-neutral float-left" title="pyALF" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Sameer, Saloni Deepak, Dazhi Zhou, Isaac Sierra, Julissa Sarmiento.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
