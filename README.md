@@ -49,7 +49,6 @@ This installation approach allows edits to the code / `git pull` updates to be d
 ```
 pip install -e .
 ```
-Note: pip will use setup.py to install your module. Avoid calling setup.py directly.
 
 ## **Include `pyALF` in your `$PYTHONPATH`:**
 
