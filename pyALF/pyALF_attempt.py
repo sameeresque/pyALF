@@ -91,7 +91,7 @@ class pyALF(object):
     The main function for the pyALF pipeline. This class is meant to be used as an end-to-end pipeline.
     The qso name (str), qso_file (asdf format) and output folder (str) are required to run the pipeline.
     First we need to generate the list of the overlapping bounds based on all absorption features through 
-    overlappingbounds() function. Then we use the generate_list() function to find the possible HI absorbers,
+    overlappingbounds() function. Then we use the find_absorbers() function to find the possible HI absorbers,
     the next step is to clean the list of possible HI absorbers using clean_list() function. Finally, we plot
     the possible HI absorbers with their line profiles using plot() function.
     '''    
@@ -138,7 +138,12 @@ class pyALF(object):
         self.t1 = find_overlapping_bounds(pr_dict_n)
         pickle.dump(self.t1,open('{0}/overlappingbounds_{1}.pkl'.format(self.output_folder,self.qso),'wb'),protocol=2)
 
-    def generate_list(self):
+    def read_overlappingbounds(self):
+        '''If the user already run the overlappingbounds() and has the pkl file in the output directory,
+        this function can be used to read the overlapping bounds instead of the running from the begginning.'''
+        self.t1 = pd.read_pickle('{0}/overlappingbounds_{1}.pkl'.format(self.output_folder,self.qso))
+
+    def find_absorbers(self):
         '''The process to find possible HI absorbers based on available HI transitions from the overlapping bounds.
         and return the list of their redshifts with their counts and save it into the output directory.'''
         redshift_list = []
@@ -152,7 +157,13 @@ class pyALF(object):
 
         self.res_list = sorted(number_counts.items(), key=lambda x: x[1], reverse=True)
         pickle.dump(self.res_list,open('{0}/resultlist_{1}.pkl'.format(self.output_folder,self.qso),'wb'),protocol=2)
-        
+
+    def read_absorbers(self):
+        '''If the user already run the find_absorbers() and has the pkl file in the output directory,
+        this function can be used to read the result list of possible HI absorbers instead of the running 
+        from stratch.'''
+        self.res_list = pd.read_pickle('{0}/resultlist_{1}.pkl'.format(self.output_folder,self.qso))
+
     def clean_list(self): 
         '''The process to remove the possible false positive and return the most possible 
         HI absorber candidates with their redshifts.'''
@@ -162,6 +173,11 @@ class pyALF(object):
         self.selected_res = [res for res, good in zip(self.res_list, redshift_good) if good == 1]
         pickle.dump(self.selected_res,open('{0}/selected_res_{1}.pkl'.format(self.output_folder,self.qso),'wb'),protocol=2)
 
+    def read_clean_list(self):
+        '''If the user already run the clean_list() and has the pkl file in the output directory,
+        this function can be used to read the the list.'''
+        self.selected_res = pd.read_pickle('{0}/selected_res_{1}.pkl'.format(self.output_folder,self.qso))
+        
     def plot(self):
         '''
         The main pyALF plotting function to provide the all possible HI absorbers with their line profiles in the output directory.
