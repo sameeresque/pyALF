@@ -5,7 +5,7 @@ import pandas as pd
 import asdf
 import spectres
 import pynorm
-from pynorm.ios import read_inorm
+from pynorm.io import read_inorm
 from pynorm.aod import pyn_batch
 from scipy.interpolate import interp1d
 from itertools import combinations
@@ -177,7 +177,7 @@ class pyALF(object):
         '''If the user already run the clean_list() and has the pkl file in the output directory,
         this function can be used to read the the list.'''
         self.selected_res = pd.read_pickle('{0}/selected_res_{1}.pkl'.format(self.output_folder,self.qso))
-        
+
     def plot(self):
         '''
         The main pyALF plotting function to provide the all possible HI absorbers with their line profiles in the output directory.
