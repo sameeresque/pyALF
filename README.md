@@ -40,13 +40,6 @@ pip show pyNorm
 ```
 git clone https://github.com/sameeresque/pyALF/
 cd pyALF
-pip install .
-```
-
-## **Editable `pip` installation:**
-
-This installation approach allows edits to the code / `git pull` updates to be directly accessible. To enable this installation, invoke the following in the terminal from within the `pyALF` directory:
-```
 pip install -e .
 ```
 
