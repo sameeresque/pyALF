@@ -39,15 +39,39 @@ def clean_spectra(wave,flux,err):
 ############## Functions from myfuncpyNorm ###############
 
 def fix_unwriteable_spec(spec):
+    """
+    Fixes arrays that are non-writeable due to discontiguous memory
+
+    Args:
+        spec(array): numpy array.  Input spectra
+
+    Returns:
+        spec(array): Corrected spectra
+    """
+
     # FIX NON-WRITEABLE ARRAYS due to discontiguous memory
     for kkk in spec.keys():
         if isinstance(spec[kkk],(np.ndarray)):
             spec[kkk] = spec[kkk].copy()
 
     return spec
+
+
+
 def integration_weights(x,limits):
-    # Calculate the weighting for each pixel in the column density integration.
-    #  Includes partial pixel weighting for edge effects.
+    """
+    Calculate the weighting for each pixel in the column density integration.
+    Includes partial pixel weighting for edge effects.
+    
+    Args:
+        x(array): Array of the velocities
+        limits(array): Limits of column density integration
+
+    Returns:
+        weights(array): returns an array of weights
+        
+    """
+
 
     # Pixel number array
     pix_num_array = np.arange(len(x))
@@ -81,6 +105,11 @@ def integration_weights(x,limits):
 
 def pynn_istat(spec_in,integration_limits = None,
                 partial_pixels = True):
+    """
+
+    Inherited from PyNorm.
+    
+    """
 
     spec = spec_in.copy()
 
@@ -268,6 +297,12 @@ def pynn_istat(spec_in,integration_limits = None,
 
 def pynn_column(spec_in, integration_limits = None,
                 partial_pixels = True):
+    
+    """
+
+    Inherited from PyNorm.
+    
+    """
 
     spec = spec_in.copy()
 
@@ -425,6 +460,11 @@ def pynn_column(spec_in, integration_limits = None,
 
 def pynn_eqwidth(spec_in,integration_limits = None,
                 partial_pixels = True):
+    """
+
+    Inherited from PyNorm.
+    
+    """
 
     spec = spec_in.copy()
 
@@ -631,6 +671,21 @@ def findV(zAbs, zEm):
 '''
 
 def getdict(spectrum,species,z):
+
+    """
+    Creating a dictionary with useful values
+
+    Args:
+        spectrum(array): input spectra
+        species(array): 
+        z(value): redshift
+
+    Returns:
+        ditionary(dict): dictionary containing: veloctiy, flux, eflux, 
+        wavc, fval, continuum, continuum error
+
+    """
+
     dictionary = {}
     obs_wave = spectrum[1].data['WAVE'][0]
     flux = spectrum[1].data['FLUX'][0]
@@ -654,6 +709,20 @@ def getdict(spectrum,species,z):
 
     
 def getproperty(dictionary,integ):
+    """
+    Function to automate using the PyNorm functions: pynn_istat, pynn_column, pynn_eqwidth
+
+    Args:
+        dictionary(dictionary): dictionary of values
+        integ(array): integration limits
+
+    Returns:
+        dictionary of values
+
+    """
+
+
+
     s1 = pynn_istat(dictionary,integration_limits = [integ[0],integ[1]],partial_pixels = True)
     
     s2 = pynn_column(dictionary,integration_limits = [integ[0],integ[1]],partial_pixels = True)
@@ -1205,6 +1274,16 @@ def at_least_three_above_threshold(numbers, threshold=0.6):
     return sum(1 for num in numbers if num > threshold) >= 3
 
 def redshiftgood(redshift):
+    """Good redshift estimate
+
+    Checking if we have a good estimate of the Redshift.
+
+    Args:
+        redshift (float): float Redshift.
+
+    Returns:
+        1 or 0 (boolean) : Returns 1 if we have a redshift based on three lines and 0 otherwise.
+    """
     import warnings
     warnings.filterwarnings("ignore")
     cov_transitions=[]
