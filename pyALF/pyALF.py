@@ -23,6 +23,9 @@ from matplotlib.ticker import (MultipleLocator, FormatStrFormatter,FuncFormatter
 transition_library=pd.read_table('atomdata_updated_new.dat', sep='\s+',header=None,comment = "#")
 transition_library=np.asarray(transition_library)
 
+# create folder for images
+if not os.path.exists('./test_images'):
+    os.makedirs('./test_images')
 
 
 qso = 'J121930+494052'
@@ -166,4 +169,4 @@ for num,res in enumerate(selected_res[0:50]):
     fig.text(0.03, 0.5, 'Normalized Flux', ha='center', va='center', rotation='vertical',fontsize=20)
 
     ax.set_title('{}'.format(res[0]))
-    plt.savefig('{}.png'.format(num), bbox_inches='tight')
+    plt.savefig('./test_images/{}.png'.format(num), bbox_inches='tight')
