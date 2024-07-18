@@ -4,13 +4,18 @@ A python Absorption Line Finding Tool. pyALF looks for weak HI absorption lines 
 1. Search for 'genuine' absorbers.
 2. Calculate the redshift of each probable Lyman alpha absorption, and look for corresponding Lyman series lines. By default, the code checks for all possible lines but an absorption system is flagged 'genuine' if atleast HI 1216 and HI 1026 are detected.
 
+Here's a detailed <a href="https://github.com/sameeresque/pyALF/blob/main/docs/_build/html/index.html" title="Documentation">Documentation</a>.
+
 # Installing `pyALF`
 
 Before installing pyALF, it is suggested to create a conda environment for pyALF
 ```
 conda create -n pyALF python=3.10
 ```
-
+Activate the conda environment
+```
+conda activate pyALF
+```
 In addition to installing the packages in requirements.txt, you will need to install pyNorm which provides some useful functions for the measurement of absorption line properties 
 ```
 pip install git+https://github.com/jchowk/pyNorm.git
