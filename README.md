@@ -55,7 +55,7 @@ pip install -e .
 Add the full path to the `pyALF` code to your `$PYTHONPATH` variable by invoking, or better yet add the path to .bashrc and .profile files
 
 ```
-export PYTHONPATH="$PYTHONPATH:/path/to/pyALF/etc/"
+export PYTHONPATH="$PYTHONPATH:/path/to/pyALF/"
 ```
 
 # **To Uninstall pyALF**
