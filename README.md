@@ -1,8 +1,8 @@
 # pyALF
-A python Absorption Line Finding Tool. pyALF looks for weak HI absorption lines in the spectra of quasars, and returns a list of absorption line systems. This is done in two steps:
+A python Absorption Line Finding Tool. pyALF looks for HI absorption lines in the spectra of quasars, and returns a list of absorption line systems. This is done in two steps:
 
 1. Search for 'genuine' absorbers.
-2. Calculate the redshift of each probable Lyman alpha absorption, and look for corresponding Lyman series lines. By default, the code checks for all possible lines but an absorption system is flagged 'genuine' if atleast HI 1216 and HI 1026 are detected.
+2. Calculate the redshift of each probable Lyman alpha absorption, and look for corresponding Lyman series lines. By default, the code checks for all possible lines but an absorption system is flagged 'genuine' if atleast HI 1215 and HI 1025 are detected.
 
 Here's a detailed <a href="https://github.com/sameeresque/pyALF/blob/main/docs/_build/html/index.html" title="Documentation">Documentation</a>.
 
@@ -40,13 +40,6 @@ pip show pyNorm
 ```
 git clone https://github.com/sameeresque/pyALF/
 cd pyALF
-pip install .
-```
-
-## **Editable `pip` installation:**
-
-This installation approach allows edits to the code / `git pull` updates to be directly accessible. To enable this installation, invoke the following in the terminal from within the `pyALF` directory:
-```
 pip install -e .
 ```
 

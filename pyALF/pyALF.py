@@ -173,9 +173,4 @@ for num,res in enumerate(selected_res[0:20]):
     fig.text(0.03, 0.5, 'Normalized Flux', ha='center', va='center', rotation='vertical',fontsize=20)
 
     ax.set_title('{}'.format(res[0]))
-<<<<<<< Updated upstream
     plt.savefig('./{0}_images/{1}.png'.format(qso,num), bbox_inches='tight')
-=======
-    plt.savefig('./test_images/{}.png'.format(num), bbox_inches='tight')
-                                                                 
->>>>>>> Stashed changes
