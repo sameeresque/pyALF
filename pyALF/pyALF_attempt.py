@@ -15,20 +15,85 @@ from scipy.signal import argrelextrema, argrelmax
 from collections import OrderedDict
 from functions_pyALF import *
 from collections import Counter
+import pickle
+from multiprocessing import Pool
 import matplotlib.pyplot as plt
 from matplotlib.ticker import (MultipleLocator, FormatStrFormatter,FuncFormatter,
                                AutoMinorLocator)
 import warnings
 warnings.filterwarnings("ignore")
+from itertools import repeat
 
 
 path = os.path.dirname(__file__)
 #path = os.path.abspath(__file__).resolve().parent
 
+'''
+def plot(num, res, wave, flux, err, species, output_folder, qso):
+    fig = plt.figure(figsize=(9,14))
+    ax = fig.add_subplot(511)
+    ax1 = fig.add_subplot(512,sharex = ax)
+    ax2 = fig.add_subplot(513,sharex = ax)
+    ax3 = fig.add_subplot(514,sharex = ax)
+    ax4 = fig.add_subplot(515,sharex = ax)
+    #for num,res in enumerate(self.selected_res[0:20]):
+    plt.cla()
+    ax.clear()
+    ax1.clear()
+    ax2.clear()
+    ax3.clear()
+    ax4.clear()
+    vel = getVel(wave,species['HI']['1215'][0],res[0])
+    
+    vel_sel = np.where((vel<=500) & (vel>=-500))
+    ax.errorbar(vel[vel_sel],flux[vel_sel],color='gray', yerr=err[vel_sel],fmt='.',ls='none',label='HI-1215')
+    
+    vel = getVel(wave,species['HI']['1025'][0],res[0])
+    
+    vel_sel = np.where((vel<=500) & (vel>=-500))
+    ax1.errorbar(vel[vel_sel],flux[vel_sel],color='gray', yerr=err[vel_sel],fmt='.',ls='none',label='HI-1025')
+    
+    vel = getVel(wave,species['HI']['972'][0],res[0])
+    
+    vel_sel = np.where((vel<=500) & (vel>=-500))
+    ax2.errorbar(vel[vel_sel],flux[vel_sel],color='gray', yerr=err[vel_sel],fmt='.',ls='none',label='HI-972')
+    
+    vel = getVel(wave,species['HI']['949'][0],res[0])
+    
+    vel_sel = np.where((vel<=500) & (vel>=-500))
+    ax3.errorbar(vel[vel_sel],flux[vel_sel],color='gray', yerr=err[vel_sel],fmt='.',ls='none',label='HI-949')
+    
+    vel = getVel(wave,species['HI']['937'][0],res[0])
+    
+    vel_sel = np.where((vel<=500) & (vel>=-500))
+    ax4.errorbar(vel[vel_sel],flux[vel_sel],color='gray', yerr=err[vel_sel],fmt='.',ls='none',label='HI-937')
+    
+    for axi in [ax,ax1,ax2,ax3,ax4]:
+        axi.legend(frameon=True,loc='best')
+        axi.axhline(y=1,linestyle='--',color='black')
+        axi.tick_params(axis='both', direction='in', which='major', length=4, width=1,labelsize=16)
+        axi.tick_params(axis='both', direction='in', which='minor', length=2, width=1,labelsize=16)
+        axi.yaxis.set_major_locator(MultipleLocator(0.5))
+        axi.yaxis.set_minor_locator(MultipleLocator(0.1))
+        axi.xaxis.set_major_locator(MultipleLocator(100))
+        axi.xaxis.set_minor_locator(MultipleLocator(50))
+
+    fig.text(0.5, 0.05, r'Relative Velocity [km s$^{-1}$]', ha='center', va='center',fontsize=20)
+    fig.text(0.03, 0.5, 'Normalized Flux', ha='center', va='center', rotation='vertical',fontsize=20)
+
+    ax.set_title('{}'.format(res[0]))
+    plt.savefig('{0}/{1}_images/{2}.png'.format(output_folder,qso,num), bbox_inches='tight')
+    plt.close()
+'''
+
 class pyALF(object):
     '''
     The main function for the pyALF pipeline. This class is meant to be used as an end-to-end pipeline.
     The qso name (str), qso_file (asdf format) and output folder (str) are required to run the pipeline.
+    First we need to generate the list of the overlapping bounds based on all absorption features through 
+    overlappingbounds() function. Then we use the generate_list() function to find the possible HI absorbers,
+    the next step is to clean the list of possible HI absorbers using clean_list() function. Finally, we plot
+    the possible HI absorbers with their line profiles using plot() function.
     '''    
     def __init__(self,qso, qso_file,output_folder):
         # read in the atom data file
@@ -59,142 +124,154 @@ class pyALF(object):
 
     def overlappingbounds(self):
         '''Search for the overlapping bounds in the selected spectrum and return an array.'''
-        self.t1 = pd.read_pickle('/Users/dazhi/Downloads/codeastro/pyALF/Example/overlappingbounds_J121930+494052.pkl')
-
-    def resultlist(self):
-        '''(some processing and) Return the list of redshifts with their counts.'''
-        self.res_list = pd.read_pickle('/Users/dazhi/Downloads/codeastro/pyALF/Example/resultlist_J121930+494052.pkl')
-
-    def selected_res(self): 
-        '''(some processing and) Return the selected redshifts.'''
-        self.selected_res = pd.read_pickle('/Users/dazhi/Downloads/codeastro/pyALF/Example/selected_res_J121930+494052.pkl')
-
-    def pipeline(self):
-            '''
-            The main pyALF pipeline function to provide the all possible HI absorbers with their line profiles.
-
-            This is an end-to-end function for the pyALF package, it will read the quasar spectrum
-            and make the plot for the possible HI absorbers with their profile in different transitions.
+        pr_dict=OrderedDict()
+        for num,pr_i in enumerate(self.pr):
             
-            Parameters:
-            qso_file (str): The path to the quasar spectrum file in asdf format.
-            output_folder (str): The path to the output folder where the plots will be saved.
+            z_window = OrderedDict()
+            wave_window = self.selected_spec[pr_i[0]:pr_i[1]]['WAVELENGTH']
+            for transition in self.species['HI']:
+                z_window[transition] = (wave_window/self.species['HI'][transition][0]) - 1.0
+            filtered_dictionary = filter_and_transform_dictionary(z_window, self.zem)
+            pr_dict[num] = filtered_dictionary   
+        pr_dict_n = remove_empty_filter_dictionary(pr_dict)
 
-            Note: 
-            This function won't return anything, it will save the plots in the folder named as '{qso}_images'.
-            '''
+        self.t1 = find_overlapping_bounds(pr_dict_n)
+        pickle.dump(self.t1,open('{0}/overlappingbounds_{1}.pkl'.format(self.output_folder,self.qso),'wb'),protocol=2)
+
+    def generate_list(self):
+        '''The process to find possible HI absorbers based on available HI transitions from the overlapping bounds.
+        and return the list of their redshifts with their counts and save it into the output directory.'''
+        redshift_list = []
+        for num,list_ in enumerate(self.filtered_list):
+            inp = getinfozblock(self.wave,self.flux,self.err,list_)
+            output_list = get_merged_transitions_tuples(inp)
+            for item_ in output_list:
+                for vel in item_[1]:
+                    redshift_list.append(vel[2])
+        number_counts = Counter(redshift_list)
+
+        self.res_list = sorted(number_counts.items(), key=lambda x: x[1], reverse=True)
+        pickle.dump(self.res_list,open('{0}/resultlist_{1}.pkl'.format(self.output_folder,self.qso),'wb'),protocol=2)
+        
+    def clean_list(self): 
+        '''The process to remove the possible false positive and return the most possible 
+        HI absorber candidates with their redshifts.'''
+        redshift_good = []
+        for num, val in enumerate(self.res_list):
+            redshift_good.append(redshiftgood(val[0]))
+        self.selected_res = [res for res, good in zip(self.res_list, redshift_good) if good == 1]
+        pickle.dump(self.selected_res,open('{0}/selected_res_{1}.pkl'.format(self.output_folder,self.qso),'wb'),protocol=2)
+
+    def plot(self):
+        '''
+        The main pyALF plotting function to provide the all possible HI absorbers with their line profiles in the output directory.
+
+        This is an end-to-end function for the pyALF package, it will read the quasar spectrum
+        and make the plot for the possible HI absorbers with their profile in different transitions.
+        
+        Parameters:
+        qso_file (str): The path to the quasar spectrum file in asdf format.
+        output_folder (str): The path to the output folder where the plots will be saved.
+
+        Note: 
+        This function won't return anything, it will save the plots in the folder named as '{qso}_images'.
+        '''
+
+        new_list = []
+        for num_t1,blk in enumerate(self.t1):
+            result_list = split_tuples(blk)
+            new_list.append(result_list)
+        import itertools
+        merged = list(itertools.chain(*new_list))
+
+        filtered_list = [tpl for tpl in merged if any(subtpl[1] == '1215' for subtpl in tpl)]
+
+        '''pool = Pool(4)
+        pool.starmap(plot, zip(range(len(filtered_list[0:21])),filtered_list[0:21], repeat(self.wave),repeat(self.flux), repeat(self.err), repeat(self.species), repeat(self.output_folder), repeat(self.qso)))
+        '''        
+        # time consuming steps#
+        # redshift_list = []
+        # for num,list_ in enumerate(filtered_list):
+        #     print (num)
+        #     inp = getinfozblock(wave,flux,err,list_)
+        #     output_list = get_merged_transitions_tuples(inp)
+        #     for item_ in output_list:
+        #         for vel in item_[1]:
+        #             redshift_list.append(vel[2])
+        #number_counts = Counter(redshift_list)
+        #result_list = sorted(number_counts.items(), key=lambda x: x[1], reverse=True)
+        #pickle.dump(result_list,open('resultlist_J121930+494052.pkl','wb'),protocol=2)
+
+        #sorted_res_list =sorted(res_list, key=lambda element: element[0])
 
 
-            pr_dict=OrderedDict()
-            for num,pr_i in enumerate(self.pr):
-                
-                z_window = OrderedDict()
-                wave_window = self.selected_spec[pr_i[0]:pr_i[1]]['WAVELENGTH']
-                for transition in self.species['HI']:
-                    z_window[transition] = (wave_window/self.species['HI'][transition][0]) - 1.0
-                filtered_dictionary = filter_and_transform_dictionary(z_window, self.zem)
-                pr_dict[num] = filtered_dictionary   
+        #pickle.dump(result_list,open('resultlist_J121930+494052.pkl','wb'),protocol=2)
 
 
-            pr_dict_n = remove_empty_filter_dictionary(pr_dict)
+        # redshift_good = []
+        # for num, val in enumerate(res_list):
+        #     redshift_good.append(redshiftgood(val[0]))
+        #selected_res = [res for res, good in zip(res_list, redshift_good) if good == 1]
+        #pickle.dump(selected_res,open('selected_res_J121930+494052.pkl','wb'),protocol=2)
 
-            #t1 = find_overlapping_bounds(pr_dict_n)
-            #pickle.dump(t1,open('overlappingbounds_J121930+494052.pkl','wb'),protocol=2)
-
-            new_list = []
-            for num_t1,blk in enumerate(self.t1):
-                result_list = split_tuples(blk)
-                new_list.append(result_list)
-            import itertools
-            merged = list(itertools.chain(*new_list))
-
-
-            filtered_list = [tpl for tpl in merged if any(subtpl[1] == '1215' for subtpl in tpl)]
-
-
-            # time consuming steps#
-            # redshift_list = []
-            # for num,list_ in enumerate(filtered_list):
-            #     print (num)
-            #     inp = getinfozblock(wave,flux,err,list_)
-            #     output_list = get_merged_transitions_tuples(inp)
-            #     for item_ in output_list:
-            #         for vel in item_[1]:
-            #             redshift_list.append(vel[2])
-            #number_counts = Counter(redshift_list)
-            #result_list = sorted(number_counts.items(), key=lambda x: x[1], reverse=True)
-            #pickle.dump(result_list,open('resultlist_J121930+494052.pkl','wb'),protocol=2)
-
-            #sorted_res_list =sorted(res_list, key=lambda element: element[0])
-
-
-            #pickle.dump(result_list,open('resultlist_J121930+494052.pkl','wb'),protocol=2)
-
-
-            # redshift_good = []
-            # for num, val in enumerate(res_list):
-            #     redshift_good.append(redshiftgood(val[0]))
-            #selected_res = [res for res, good in zip(res_list, redshift_good) if good == 1]
-            #pickle.dump(selected_res,open('selected_res_J121930+494052.pkl','wb'),protocol=2)
-
-            ## plotting 
+        ## plotting 
 
 
 
-            #plt.style.use('seaborn-white')
-            #plt.rc('font', family='serif')
-            fig = plt.figure(figsize=(9,14))
+        #plt.style.use('seaborn-white')
+        #plt.rc('font', family='serif')
+        fig = plt.figure(figsize=(9,14))
 
-            ax = fig.add_subplot(511)
-            ax1 = fig.add_subplot(512,sharex = ax)
-            ax2 = fig.add_subplot(513,sharex = ax)
-            ax3 = fig.add_subplot(514,sharex = ax)
-            ax4 = fig.add_subplot(515,sharex = ax)
+        ax = fig.add_subplot(511)
+        ax1 = fig.add_subplot(512,sharex = ax)
+        ax2 = fig.add_subplot(513,sharex = ax)
+        ax3 = fig.add_subplot(514,sharex = ax)
+        ax4 = fig.add_subplot(515,sharex = ax)
 
-            for num,res in enumerate(self.selected_res[0:20]):
-                plt.cla()
-                ax.clear()
-                ax1.clear()
-                ax2.clear()
-                ax3.clear()
-                ax4.clear()
-                vel = getVel(self.wave,self.species['HI']['1215'][0],res[0])
-                
-                vel_sel = np.where((vel<=500) & (vel>=-500))
-                ax.errorbar(vel[vel_sel],self.flux[vel_sel],color='gray', yerr=self.err[vel_sel],fmt='.',ls='none',label='HI-1215')
-                
-                vel = getVel(self.wave,self.species['HI']['1025'][0],res[0])
-                
-                vel_sel = np.where((vel<=500) & (vel>=-500))
-                ax1.errorbar(vel[vel_sel],self.flux[vel_sel],color='gray', yerr=self.err[vel_sel],fmt='.',ls='none',label='HI-1025')
-                
-                vel = getVel(self.wave,self.species['HI']['972'][0],res[0])
-                
-                vel_sel = np.where((vel<=500) & (vel>=-500))
-                ax2.errorbar(vel[vel_sel],self.flux[vel_sel],color='gray', yerr=self.err[vel_sel],fmt='.',ls='none',label='HI-972')
-                
-                vel = getVel(self.wave,self.species['HI']['949'][0],res[0])
-                
-                vel_sel = np.where((vel<=500) & (vel>=-500))
-                ax3.errorbar(vel[vel_sel],self.flux[vel_sel],color='gray', yerr=self.err[vel_sel],fmt='.',ls='none',label='HI-949')
-                
-                vel = getVel(self.wave,self.species['HI']['937'][0],res[0])
-                
-                vel_sel = np.where((vel<=500) & (vel>=-500))
-                ax4.errorbar(vel[vel_sel],self.flux[vel_sel],color='gray', yerr=self.err[vel_sel],fmt='.',ls='none',label='HI-937')
-                
-                for axi in [ax,ax1,ax2,ax3,ax4]:
-                    axi.legend(frameon=True,loc='best')
-                    axi.axhline(y=1,linestyle='--',color='black')
-                    axi.tick_params(axis='both', direction='in', which='major', length=4, width=1,labelsize=16)
-                    axi.tick_params(axis='both', direction='in', which='minor', length=2, width=1,labelsize=16)
-                    axi.yaxis.set_major_locator(MultipleLocator(0.5))
-                    axi.yaxis.set_minor_locator(MultipleLocator(0.1))
-                    axi.xaxis.set_major_locator(MultipleLocator(100))
-                    axi.xaxis.set_minor_locator(MultipleLocator(50))
+        for num,res in enumerate(self.selected_res[0:20]):
+            plt.cla()
+            ax.clear()
+            ax1.clear()
+            ax2.clear()
+            ax3.clear()
+            ax4.clear()
+            vel = getVel(self.wave,self.species['HI']['1215'][0],res[0])
+            
+            vel_sel = np.where((vel<=500) & (vel>=-500))
+            ax.errorbar(vel[vel_sel],self.flux[vel_sel],color='gray', yerr=self.err[vel_sel],fmt='.',ls='none',label='HI-1215')
+            
+            vel = getVel(self.wave,self.species['HI']['1025'][0],res[0])
+            
+            vel_sel = np.where((vel<=500) & (vel>=-500))
+            ax1.errorbar(vel[vel_sel],self.flux[vel_sel],color='gray', yerr=self.err[vel_sel],fmt='.',ls='none',label='HI-1025')
+            
+            vel = getVel(self.wave,self.species['HI']['972'][0],res[0])
+            
+            vel_sel = np.where((vel<=500) & (vel>=-500))
+            ax2.errorbar(vel[vel_sel],self.flux[vel_sel],color='gray', yerr=self.err[vel_sel],fmt='.',ls='none',label='HI-972')
+            
+            vel = getVel(self.wave,self.species['HI']['949'][0],res[0])
+            
+            vel_sel = np.where((vel<=500) & (vel>=-500))
+            ax3.errorbar(vel[vel_sel],self.flux[vel_sel],color='gray', yerr=self.err[vel_sel],fmt='.',ls='none',label='HI-949')
+            
+            vel = getVel(self.wave,self.species['HI']['937'][0],res[0])
+            
+            vel_sel = np.where((vel<=500) & (vel>=-500))
+            ax4.errorbar(vel[vel_sel],self.flux[vel_sel],color='gray', yerr=self.err[vel_sel],fmt='.',ls='none',label='HI-937')
+            
+            for axi in [ax,ax1,ax2,ax3,ax4]:
+                axi.legend(frameon=True,loc='best')
+                axi.axhline(y=1,linestyle='--',color='black')
+                axi.tick_params(axis='both', direction='in', which='major', length=4, width=1,labelsize=16)
+                axi.tick_params(axis='both', direction='in', which='minor', length=2, width=1,labelsize=16)
+                axi.yaxis.set_major_locator(MultipleLocator(0.5))
+                axi.yaxis.set_minor_locator(MultipleLocator(0.1))
+                axi.xaxis.set_major_locator(MultipleLocator(100))
+                axi.xaxis.set_minor_locator(MultipleLocator(50))
 
-                fig.text(0.5, 0.05, r'Relative Velocity [km s$^{-1}$]', ha='center', va='center',fontsize=20)
-                fig.text(0.03, 0.5, 'Normalized Flux', ha='center', va='center', rotation='vertical',fontsize=20)
+            fig.text(0.5, 0.05, r'Relative Velocity [km s$^{-1}$]', ha='center', va='center',fontsize=20)
+            fig.text(0.03, 0.5, 'Normalized Flux', ha='center', va='center', rotation='vertical',fontsize=20)
 
-                ax.set_title('{}'.format(res[0]))
-                plt.savefig('{0}/{1}_images/{2}.png'.format(self.output_folder,self.qso,num), bbox_inches='tight')
+            ax.set_title('{}'.format(res[0]))
+            plt.savefig('{0}/{1}_images/{2}.png'.format(self.output_folder,self.qso,num), bbox_inches='tight')
