@@ -102,6 +102,8 @@ class pyALF(object):
         self.qso = qso
         self.output_folder = output_folder
         # create folder for images
+        if not os.path.exists('{0}'.format(self.output_folder)):
+            os.makedirs('{0}'.format(self.output_folder))
         if not os.path.exists('{0}/{1}_images'.format(self.output_folder,self.qso)):
             os.makedirs('{0}/{1}_images'.format(self.output_folder,self.qso))
         self.plot_ions=['HI']
