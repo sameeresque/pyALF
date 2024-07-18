@@ -1,5 +1,6 @@
 #!/usr/bin/python
 import os
+import sys
 import pandas as pd
 import asdf
 import spectres
@@ -17,7 +18,8 @@ from collections import Counter
 import matplotlib.pyplot as plt
 from matplotlib.ticker import (MultipleLocator, FormatStrFormatter,FuncFormatter,
                                AutoMinorLocator)
-
+import warnings
+warnings.filterwarnings("ignore")
 
 # read in the atom data file
 transition_library=pd.read_table('atomdata_updated_new.dat', sep='\s+',header=None,comment = "#")
@@ -25,7 +27,8 @@ transition_library=np.asarray(transition_library)
 
 
 
-qso = 'J121930+494052'
+#qso = 'J121930+494052'
+qso = sys.argv[1] 
 filein = '../Example/{0}.asdf'.format(qso)
 plot_ions=['HI']
 af = asdf.open(filein)
@@ -65,7 +68,7 @@ pr_dict_n = remove_empty_filter_dictionary(pr_dict)
 #pickle.dump(t1,open('overlappingbounds_J121930+494052.pkl','wb'),protocol=2)
 
 
-t1 = pd.read_pickle('../Example/overlappingbounds_J121930+494052.pkl')
+t1 = pd.read_pickle('../Example/overlappingbounds_{0}.pkl'.format(qso))
 
 
 new_list = []
@@ -92,7 +95,7 @@ filtered_list = [tpl for tpl in merged if any(subtpl[1] == '1215' for subtpl in 
 #result_list = sorted(number_counts.items(), key=lambda x: x[1], reverse=True)
 #pickle.dump(result_list,open('resultlist_J121930+494052.pkl','wb'),protocol=2)
 
-res_list = pd.read_pickle('../Example/resultlist_J121930+494052.pkl')
+res_list = pd.read_pickle('../Example/resultlist_{0}.pkl'.format(qso))
 #sorted_res_list =sorted(res_list, key=lambda element: element[0])
 
 
@@ -104,7 +107,7 @@ res_list = pd.read_pickle('../Example/resultlist_J121930+494052.pkl')
 #     redshift_good.append(redshiftgood(val[0]))
 #selected_res = [res for res, good in zip(res_list, redshift_good) if good == 1]
 #pickle.dump(selected_res,open('selected_res_J121930+494052.pkl','wb'),protocol=2)
-selected_res = pd.read_pickle('../Example/selected_res_J121930+494052.pkl')
+selected_res = pd.read_pickle('../Example/selected_res_{0}.pkl'.format(qso))
 
 ## plotting 
 
@@ -120,7 +123,7 @@ ax2 = fig.add_subplot(513,sharex = ax)
 ax3 = fig.add_subplot(514,sharex = ax)
 ax4 = fig.add_subplot(515,sharex = ax)
 
-for num,res in enumerate(selected_res[0:50]):
+for num,res in enumerate(selected_res[0:20]):
     plt.cla()
     ax.clear()
     ax1.clear()
