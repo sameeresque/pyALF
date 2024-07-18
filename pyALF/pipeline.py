@@ -135,15 +135,17 @@ class pyALF(object):
                 z_window[transition] = (wave_window/self.species['HI'][transition][0]) - 1.0
             filtered_dictionary = filter_and_transform_dictionary(z_window, self.zem)
             pr_dict[num] = filtered_dictionary   
-        pr_dict_n = remove_empty_filter_dictionary(pr_dict)
+        self.pr_dict_n = remove_empty_filter_dictionary(pr_dict)
 
-        self.t1 = find_overlapping_bounds(pr_dict_n)
+        self.t1 = find_overlapping_bounds(self.pr_dict_n)
         pickle.dump(self.t1,open('{0}/overlappingbounds_{1}.pkl'.format(self.output_folder,self.qso),'wb'),protocol=2)
+        pickle.dump(self.pr_dict_n,open('{0}/pr_dict_n_{1}.pkl'.format(self.output_folder,self.qso),'wb'),protocol=2)
 
     def read_overlappingbounds(self):
         '''If the user already run the overlappingbounds() and has the pkl file in the output directory,
         this function can be used to read the overlapping bounds instead of the running from the begginning.'''
         self.t1 = pd.read_pickle('{0}/overlappingbounds_{1}.pkl'.format(self.output_folder,self.qso))
+        self.pr_dict_n = pd.read_pickle('{0}/pr_dict_n_{1}.pkl'.format(self.output_folder,self.qso))
 
     def find_absorbers(self):
         '''The process to find possible HI absorbers based on available HI transitions from the overlapping bounds.
@@ -160,7 +162,7 @@ class pyALF(object):
         self.filtered_list = [tpl for tpl in merged if any(subtpl[1] == '1215' for subtpl in tpl)]
 
         for num,list_ in enumerate(self.filtered_list):
-            inp = getinfozblock(self.wave,self.flux,self.err,list_)
+            inp = getinfozblock(self.wave,self.flux,self.err,list_,self.pr_dict_n)
             output_list = get_merged_transitions_tuples(inp)
             for item_ in output_list:
                 for vel in item_[1]:
