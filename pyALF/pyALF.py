@@ -1,4 +1,4 @@
-#imports#
+#!/usr/bin/python
 import os
 import pandas as pd
 import asdf
@@ -14,13 +14,19 @@ from scipy.signal import argrelextrema, argrelmax
 from collections import OrderedDict
 from functions_pyALF import *
 from collections import Counter
+import matplotlib.pyplot as plt
+from matplotlib.ticker import (MultipleLocator, FormatStrFormatter,FuncFormatter,
+                               AutoMinorLocator)
+
 
 # read in the atom data file
 transition_library=pd.read_table('atomdata_updated_new.dat', sep='\s+',header=None,comment = "#")
 transition_library=np.asarray(transition_library)
 
+
+
 qso = 'J121930+494052'
-filein = 'Example/{0}.asdf'.format(qso)
+filein = '../Example/{0}.asdf'.format(qso)
 plot_ions=['HI']
 af = asdf.open(filein)
 wave = np.asarray(af['wave'])
@@ -59,8 +65,7 @@ pr_dict_n = remove_empty_filter_dictionary(pr_dict)
 #pickle.dump(t1,open('overlappingbounds_J121930+494052.pkl','wb'),protocol=2)
 
 
-t1 = pd.read_pickle('Example/overlappingbounds_J121930+494052.pkl')
-
+t1 = pd.read_pickle('../Example/overlappingbounds_J121930+494052.pkl')
 
 
 new_list = []
@@ -74,6 +79,7 @@ merged = list(itertools.chain(*new_list))
 filtered_list = [tpl for tpl in merged if any(subtpl[1] == '1215' for subtpl in tpl)]
 
 
+# time consuming steps#
 # redshift_list = []
 # for num,list_ in enumerate(filtered_list):
 #     print (num)
@@ -82,16 +88,15 @@ filtered_list = [tpl for tpl in merged if any(subtpl[1] == '1215' for subtpl in 
 #     for item_ in output_list:
 #         for vel in item_[1]:
 #             redshift_list.append(vel[2])
-
-
-
 #number_counts = Counter(redshift_list)
-
-result_list = sorted(number_counts.items(), key=lambda x: x[1], reverse=True)
+#result_list = sorted(number_counts.items(), key=lambda x: x[1], reverse=True)
 #pickle.dump(result_list,open('resultlist_J121930+494052.pkl','wb'),protocol=2)
-res_list = pd.read_pickle('Example/resultlist_J121930+494052.pkl')
 
-sorted_res_list =sorted(res_list, key=lambda element: element[0])
+res_list = pd.read_pickle('../Example/resultlist_J121930+494052.pkl')
+#sorted_res_list =sorted(res_list, key=lambda element: element[0])
+
+
+#pickle.dump(result_list,open('resultlist_J121930+494052.pkl','wb'),protocol=2)
 
 
 # redshift_good = []
@@ -99,5 +104,66 @@ sorted_res_list =sorted(res_list, key=lambda element: element[0])
 #     redshift_good.append(redshiftgood(val[0]))
 #selected_res = [res for res, good in zip(res_list, redshift_good) if good == 1]
 #pickle.dump(selected_res,open('selected_res_J121930+494052.pkl','wb'),protocol=2)
+selected_res = pd.read_pickle('../Example/selected_res_J121930+494052.pkl')
 
-selected_res = pd.read_pickle('Example/selected_res_J121930+494052.pkl')
+## plotting 
+
+
+
+#plt.style.use('seaborn-white')
+#plt.rc('font', family='serif')
+fig = plt.figure(figsize=(9,14))
+
+ax = fig.add_subplot(511)
+ax1 = fig.add_subplot(512,sharex = ax)
+ax2 = fig.add_subplot(513,sharex = ax)
+ax3 = fig.add_subplot(514,sharex = ax)
+ax4 = fig.add_subplot(515,sharex = ax)
+
+for num,res in enumerate(selected_res[0:50]):
+    plt.cla()
+    ax.clear()
+    ax1.clear()
+    ax2.clear()
+    ax3.clear()
+    ax4.clear()
+    vel = getVel(wave,species['HI']['1215'][0],res[0])
+    
+    vel_sel = np.where((vel<=500) & (vel>=-500))
+    ax.errorbar(vel[vel_sel],flux[vel_sel],color='gray', yerr=err[vel_sel],fmt='.',ls='none',label='HI-1215')
+    
+    vel = getVel(wave,species['HI']['1025'][0],res[0])
+    
+    vel_sel = np.where((vel<=500) & (vel>=-500))
+    ax1.errorbar(vel[vel_sel],flux[vel_sel],color='gray', yerr=err[vel_sel],fmt='.',ls='none',label='HI-1025')
+    
+    vel = getVel(wave,species['HI']['972'][0],res[0])
+    
+    vel_sel = np.where((vel<=500) & (vel>=-500))
+    ax2.errorbar(vel[vel_sel],flux[vel_sel],color='gray', yerr=err[vel_sel],fmt='.',ls='none',label='HI-972')
+    
+    vel = getVel(wave,species['HI']['949'][0],res[0])
+    
+    vel_sel = np.where((vel<=500) & (vel>=-500))
+    ax3.errorbar(vel[vel_sel],flux[vel_sel],color='gray', yerr=err[vel_sel],fmt='.',ls='none',label='HI-949')
+    
+    vel = getVel(wave,species['HI']['937'][0],res[0])
+    
+    vel_sel = np.where((vel<=500) & (vel>=-500))
+    ax4.errorbar(vel[vel_sel],flux[vel_sel],color='gray', yerr=err[vel_sel],fmt='.',ls='none',label='HI-937')
+    
+    for axi in [ax,ax1,ax2,ax3,ax4]:
+        axi.legend(frameon=True,loc='best')
+        axi.axhline(y=1,linestyle='--',color='black')
+        axi.tick_params(axis='both', direction='in', which='major', length=4, width=1,labelsize=16)
+        axi.tick_params(axis='both', direction='in', which='minor', length=2, width=1,labelsize=16)
+        axi.yaxis.set_major_locator(MultipleLocator(0.5))
+        axi.yaxis.set_minor_locator(MultipleLocator(0.1))
+        axi.xaxis.set_major_locator(MultipleLocator(100))
+        axi.xaxis.set_minor_locator(MultipleLocator(50))
+
+    fig.text(0.5, 0.05, r'Relative Velocity [km s$^{-1}$]', ha='center', va='center',fontsize=20)
+    fig.text(0.03, 0.5, 'Normalized Flux', ha='center', va='center', rotation='vertical',fontsize=20)
+
+    ax.set_title('{}'.format(res[0]))
+    plt.savefig('{}.png'.format(num), bbox_inches='tight')

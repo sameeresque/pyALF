@@ -971,7 +971,7 @@ def split_tuples(tuple_list):
 
 
 
-def getinfozblock(wave,flux,err,block):
+def getinfozblock(wave,flux,err,block,pr_dict_n):
     """
     Analyze spectral data for a given block of transitions.
 
