@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en">
 <head>
-  <meta charset="utf-8" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Useful Functions for pyALF &mdash; pyALF v0.1.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
@@ -51,10 +52,18 @@
 <li class="toctree-l2"><a class="reference internal" href="#functions_pyALF.cossim"><code class="docutils literal notranslate"><span class="pre">cossim()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#functions_pyALF.filter_and_transform_dictionary"><code class="docutils literal notranslate"><span class="pre">filter_and_transform_dictionary()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#functions_pyALF.find_overlapping_bounds"><code class="docutils literal notranslate"><span class="pre">find_overlapping_bounds()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#functions_pyALF.fix_unwriteable_spec"><code class="docutils literal notranslate"><span class="pre">fix_unwriteable_spec()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#functions_pyALF.get_merged_transitions_tuples"><code class="docutils literal notranslate"><span class="pre">get_merged_transitions_tuples()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#functions_pyALF.getdict"><code class="docutils literal notranslate"><span class="pre">getdict()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#functions_pyALF.getdictsep"><code class="docutils literal notranslate"><span class="pre">getdictsep()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#functions_pyALF.getinfozblock"><code class="docutils literal notranslate"><span class="pre">getinfozblock()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#functions_pyALF.getproperty"><code class="docutils literal notranslate"><span class="pre">getproperty()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#functions_pyALF.integration_weights"><code class="docutils literal notranslate"><span class="pre">integration_weights()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#functions_pyALF.pynn_column"><code class="docutils literal notranslate"><span class="pre">pynn_column()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#functions_pyALF.pynn_eqwidth"><code class="docutils literal notranslate"><span class="pre">pynn_eqwidth()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#functions_pyALF.pynn_istat"><code class="docutils literal notranslate"><span class="pre">pynn_istat()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#functions_pyALF.rebin_spectra"><code class="docutils literal notranslate"><span class="pre">rebin_spectra()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#functions_pyALF.redshiftgood"><code class="docutils literal notranslate"><span class="pre">redshiftgood()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#functions_pyALF.remove_empty_filter_dictionary"><code class="docutils literal notranslate"><span class="pre">remove_empty_filter_dictionary()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#functions_pyALF.speciesinterest"><code class="docutils literal notranslate"><span class="pre">speciesinterest()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#functions_pyALF.split_tuples"><code class="docutils literal notranslate"><span class="pre">split_tuples()</span></code></a></li>
@@ -86,7 +95,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <div class="section" id="useful-functions-for-pyalf">
+  <section id="useful-functions-for-pyalf">
 <span id="functions-pyalf"></span><h1>Useful Functions for pyALF<a class="headerlink" href="#useful-functions-for-pyalf" title="Permalink to this heading"></a></h1>
 <p>These are functions that pyALF uses to find the absorbtion lines.</p>
 <span class="target" id="module-functions_pyALF"></span><dl class="py function">
@@ -95,17 +104,17 @@
 <dd><p>Clean input spectrum</p>
 <p>Removes problematic or unphysical pixels.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>wave</strong> (<em>array</em>) – numpy vector. Wavelength array.</p></li>
 <li><p><strong>flux</strong> (<em>array</em>) – numpy vector. Flux array.</p></li>
 <li><p><strong>err</strong> (<em>array</em>) – numpy vector. Error array.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>clean wavelength, flux and error arrays.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>wave, flux, error (array)</p>
 </dd>
 </dl>
@@ -148,6 +157,23 @@ However, these components are vetted further below to remove false positives.</p
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="functions_pyALF.fix_unwriteable_spec">
+<span class="sig-prename descclassname"><span class="pre">functions_pyALF.</span></span><span class="sig-name descname"><span class="pre">fix_unwriteable_spec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spec</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#functions_pyALF.fix_unwriteable_spec" title="Permalink to this definition"></a></dt>
+<dd><p>Fixes arrays that are non-writeable due to discontiguous memory</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>spec</strong> (<em>array</em>) – numpy array.  Input spectra</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Corrected spectra</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>spec(array)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="functions_pyALF.get_merged_transitions_tuples">
 <span class="sig-prename descclassname"><span class="pre">functions_pyALF.</span></span><span class="sig-name descname"><span class="pre">get_merged_transitions_tuples</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inp</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#functions_pyALF.get_merged_transitions_tuples" title="Permalink to this definition"></a></dt>
 <dd><p>Merge and group spectral transitions based on velocity proximity.</p>
@@ -181,6 +207,28 @@ list of tuples: Each tuple contains:</p>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="functions_pyALF.getdict">
+<span class="sig-prename descclassname"><span class="pre">functions_pyALF.</span></span><span class="sig-name descname"><span class="pre">getdict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spectrum</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">species</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#functions_pyALF.getdict" title="Permalink to this definition"></a></dt>
+<dd><p>Creating a dictionary with useful values</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>spectrum</strong> (<em>array</em>) – input spectra</p></li>
+<li><p><strong>species</strong> (<em>array</em>) – </p></li>
+<li><p><strong>z</strong> (<em>value</em>) – redshift</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>dictionary containing: veloctiy, flux, eflux,
+wavc, fval, continuum, continuum error</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ditionary(dict)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="functions_pyALF.getdictsep">
 <span class="sig-prename descclassname"><span class="pre">functions_pyALF.</span></span><span class="sig-name descname"><span class="pre">getdictsep</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wave</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flux</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">species</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#functions_pyALF.getdictsep" title="Permalink to this definition"></a></dt>
 <dd><p>This function is meant to create a dictionary consisting of keys that can be ingested by PyNorm.
@@ -195,10 +243,10 @@ list of tuples: Each tuple contains:</p>
 :param z: The redshift of the absorption system whose measurements are of interest.
 :type z: float</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>A dictionary that can be ingested by PyNorm for performing line measurements.</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>dict</p>
 </dd>
 </dl>
@@ -206,7 +254,7 @@ list of tuples: Each tuple contains:</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="functions_pyALF.getinfozblock">
-<span class="sig-prename descclassname"><span class="pre">functions_pyALF.</span></span><span class="sig-name descname"><span class="pre">getinfozblock</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wave</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flux</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">err</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">block</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#functions_pyALF.getinfozblock" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">functions_pyALF.</span></span><span class="sig-name descname"><span class="pre">getinfozblock</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wave</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flux</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">err</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">block</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pr_dict_n</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#functions_pyALF.getinfozblock" title="Permalink to this definition"></a></dt>
 <dd><p>Analyze spectral data for a given block of transitions.</p>
 <p>This function processes spectral data for a set of transitions, calculates
 redshift ranges, and extracts properties for each transition.</p>
@@ -236,11 +284,67 @@ limits of each transition.</p></li>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="functions_pyALF.getproperty">
+<span class="sig-prename descclassname"><span class="pre">functions_pyALF.</span></span><span class="sig-name descname"><span class="pre">getproperty</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dictionary</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">integ</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#functions_pyALF.getproperty" title="Permalink to this definition"></a></dt>
+<dd><p>Function to automate using the PyNorm functions: pynn_istat, pynn_column, pynn_eqwidth</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dictionary</strong> (<em>dictionary</em>) – dictionary of values</p></li>
+<li><p><strong>integ</strong> (<em>array</em>) – integration limits</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>dictionary of values</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="functions_pyALF.integration_weights">
+<span class="sig-prename descclassname"><span class="pre">functions_pyALF.</span></span><span class="sig-name descname"><span class="pre">integration_weights</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">limits</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#functions_pyALF.integration_weights" title="Permalink to this definition"></a></dt>
+<dd><p>Calculate the weighting for each pixel in the column density integration.
+Includes partial pixel weighting for edge effects.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>array</em>) – Array of the velocities</p></li>
+<li><p><strong>limits</strong> (<em>array</em>) – Limits of column density integration</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>returns an array of weights</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>weights(array)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="functions_pyALF.pynn_column">
+<span class="sig-prename descclassname"><span class="pre">functions_pyALF.</span></span><span class="sig-name descname"><span class="pre">pynn_column</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spec_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">integration_limits</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">partial_pixels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#functions_pyALF.pynn_column" title="Permalink to this definition"></a></dt>
+<dd><p>Inherited from PyNorm.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="functions_pyALF.pynn_eqwidth">
+<span class="sig-prename descclassname"><span class="pre">functions_pyALF.</span></span><span class="sig-name descname"><span class="pre">pynn_eqwidth</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spec_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">integration_limits</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">partial_pixels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#functions_pyALF.pynn_eqwidth" title="Permalink to this definition"></a></dt>
+<dd><p>Inherited from PyNorm.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="functions_pyALF.pynn_istat">
+<span class="sig-prename descclassname"><span class="pre">functions_pyALF.</span></span><span class="sig-name descname"><span class="pre">pynn_istat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spec_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">integration_limits</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">partial_pixels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#functions_pyALF.pynn_istat" title="Permalink to this definition"></a></dt>
+<dd><p>Inherited from PyNorm.</p>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="functions_pyALF.rebin_spectra">
 <span class="sig-prename descclassname"><span class="pre">functions_pyALF.</span></span><span class="sig-name descname"><span class="pre">rebin_spectra</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vel1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flux1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vel2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flux2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_vel</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#functions_pyALF.rebin_spectra" title="Permalink to this definition"></a></dt>
 <dd><p>This function is meant to rebin a spectrum onto a common velocity axis.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>vel1</strong> – velocity array of the first spectrum</p></li>
 <li><p><strong>flux1</strong> – flux array of the first spectrum</p></li>
@@ -248,11 +352,29 @@ limits of each transition.</p></li>
 <li><p><strong>flux2</strong> – flux array of the second spectrum</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>flux arrays of the first and second spectra.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>arrays</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="functions_pyALF.redshiftgood">
+<span class="sig-prename descclassname"><span class="pre">functions_pyALF.</span></span><span class="sig-name descname"><span class="pre">redshiftgood</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">redshift</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#functions_pyALF.redshiftgood" title="Permalink to this definition"></a></dt>
+<dd><p>Good redshift estimate</p>
+<p>Checking if we have a good estimate of the Redshift.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>redshift</strong> (<em>float</em>) – float Redshift.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Returns 1 if we have a redshift based on three lines and 0 otherwise.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>1 or 0 (boolean)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -286,7 +408,7 @@ list: A list of tuples, where each tuple contains a group of original tuples</p>
 </div></blockquote>
 </dd></dl>
 
-</div>
+</section>
 
 
            </div>
