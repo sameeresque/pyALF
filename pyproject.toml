@@ -7,22 +7,7 @@ name = "pyALF"
 version = "0.1.0"
 
 [tool.setuptools.dynamic]
-dependencies = {
-'scipy',
-'pandas',
-'scikit-learn',
-'asdf',
-'spectres',
-'Pickle5',
-'astropy',
-'matplotlib',
-'cython',
-'pytest',
-'ipykernel',
-'astroquery',
-'pytz'
-
-}
+dependencies = {}
 
 [tool.setuptools]
 py-modules = []
