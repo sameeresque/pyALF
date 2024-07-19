@@ -41,6 +41,7 @@ pip show pyNorm
 git clone https://github.com/sameeresque/pyALF/
 cd pyALF
 pip install -e .
+pip install -r requirements.txt
 ```
 
 ## **Include `pyALF` in your `$PYTHONPATH`:**
